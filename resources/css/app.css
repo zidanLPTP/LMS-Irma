@@ -1,0 +1,46 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --color-*: initial;
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-transparent: transparent;
+    --color-current: currentColor;
+
+    --font-sans: 'Nunito', system-ui, -apple-system, sans-serif;
+
+    /* Token Hijau (Utama) */
+    --color-green-50: #F0FAF4;
+    --color-green-100: #DCF3E6;
+    --color-green-300: #A8DDBF;
+    --color-green-500: #5DB88A;
+    --color-green-700: #2F7D5B;
+
+    /* Token Biru Langit (Sekunder) */
+    --color-sky-50: #EFF8FD;
+    --color-sky-100: #D9EFFA;
+    --color-sky-300: #9ED3EE;
+    --color-sky-500: #4FAFDD;
+    --color-sky-700: #1F6F9C;
+
+    /* Token Netral dan Status */
+    --color-ink: #1F2D2A;
+    --color-muted: #5B6B66;
+    --color-border: #D6E4DD;
+    --color-bg: #F7FBF9;
+    --color-success: #2F7D5B;
+    --color-warning: #B7791F;
+    --color-danger: #C0453F;
+    --color-locked: #9AA9A3;
+}
+
+:root {
+    --font-utama: 'Nunito', system-ui, sans-serif;
+    --warna-bg: #F7FBF9;
+    --warna-ink: #1F2D2A;
+}
