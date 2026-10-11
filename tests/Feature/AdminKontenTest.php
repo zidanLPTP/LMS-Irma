@@ -179,7 +179,7 @@ class AdminKontenTest extends TestCase
     {
         $this->actingAs($this->admin);
 
-        $kuis = Kuis::create(['judul' => 'Kuis Bab 1', 'tipe_kuis' => 'kuis_bab', 'status_terbit' => true]);
+        $kuis = Kuis::create(['judul' => 'Kuis Bab 1', 'tipe_kuis' => 'kuis_bab']);
 
         // PG tanpa kunci benar -> ditolak
         $this->post(route('admin.kuis.soal.store', $kuis), [
@@ -235,7 +235,7 @@ class AdminKontenTest extends TestCase
         $this->actingAs($this->admin);
 
         $bab = Bab::create(['judul' => 'Bab Riset', 'urutan' => 1, 'status_terbit' => true]);
-        $kuis = Kuis::create(['bab_id' => $bab->id, 'judul' => 'Kuis Riset', 'tipe_kuis' => 'kuis_bab', 'status_terbit' => true]);
+        $kuis = Kuis::create(['bab_id' => $bab->id, 'judul' => 'Kuis Riset', 'tipe_kuis' => 'kuis_bab']);
         $soal = Soal::create([
             'kuis_id' => $kuis->id,
             'tipe_soal' => 'pilihan_ganda',

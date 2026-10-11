@@ -4,11 +4,13 @@ use App\Http\Controllers\Admin\BabController;
 use App\Http\Controllers\Admin\BerandaController as AdminBerandaController;
 use App\Http\Controllers\Admin\KuisController;
 use App\Http\Controllers\Admin\MateriController;
+use App\Http\Controllers\Admin\PenilaianEsaiController;
 use App\Http\Controllers\Admin\SoalController;
 use App\Http\Controllers\Auth\DaftarController;
 use App\Http\Controllers\Auth\MasukController;
 use App\Http\Controllers\PenyajiMateriPdfController;
 use App\Http\Controllers\Siswa\BerandaController as SiswaBerandaController;
+use App\Http\Controllers\Siswa\DetakJantungController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,7 +37,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/keluar', [MasukController::class, 'destroy'])->middleware('auth')->name('keluar');
 
 // Area Siswa
-Route::middleware(['auth', 'peran:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
+Route::middleware(['auth', 'peran:siswa', 'catat.aktivitas'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/beranda', [SiswaBerandaController::class, 'index'])->name('beranda');
     Route::get('/bab/{bab}', [App\Http\Controllers\Siswa\BabController::class, 'show'])->name('bab.show');
     Route::get('/bab/{bab}/materi/{materi}', [App\Http\Controllers\Siswa\MateriController::class, 'show'])->name('bab.materi.show');
@@ -48,6 +50,9 @@ Route::middleware(['auth', 'peran:siswa'])->prefix('siswa')->name('siswa.')->gro
     Route::post('/percobaan/{percobaan}/serahkan', [App\Http\Controllers\Siswa\KuisController::class, 'serahkan'])->name('percobaan.serahkan');
     Route::get('/percobaan/{percobaan}/hasil', [App\Http\Controllers\Siswa\KuisController::class, 'hasil'])->name('percobaan.hasil');
 });
+
+// Endpoint Detak Jantung (Heartbeat) - Auth (siswa dicatat, admin 204), Throttle 10 req/menit
+Route::middleware(['auth', 'throttle:10,1'])->post('/detak', DetakJantungController::class)->name('siswa.detak');
 
 // Penyaji PDF Privat (Bisa diakses Siswa Berhak atau Admin yang telah login)
 Route::middleware('auth')->get('/materi-pdf/{materi}', PenyajiMateriPdfController::class)->name('materi.pdf.sajikan');
@@ -74,4 +79,9 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
     Route::resource('kuis.soal', SoalController::class)->except(['show'])->parameters(['kuis' => 'kuis']);
     Route::post('kuis/{kuis}/soal/{soal}/naik', [SoalController::class, 'naikkanUrutan'])->name('kuis.soal.naik');
     Route::post('kuis/{kuis}/soal/{soal}/turun', [SoalController::class, 'turunkanUrutan'])->name('kuis.soal.turun');
+
+    // Penilaian Esai
+    Route::get('penilaian-esai', [PenilaianEsaiController::class, 'index'])->name('penilaian-esai.index');
+    Route::get('penilaian-esai/{percobaan}', [PenilaianEsaiController::class, 'show'])->name('penilaian-esai.show');
+    Route::post('penilaian-esai/{percobaan}', [PenilaianEsaiController::class, 'simpan'])->name('penilaian-esai.simpan');
 });

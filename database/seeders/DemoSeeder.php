@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Bab;
+use App\Models\JawabanSiswa;
 use App\Models\Kuis;
 use App\Models\Materi;
+use App\Models\PercobaanKuis;
 use App\Models\PilihanJawaban;
 use App\Models\Soal;
 use App\Models\User;
@@ -278,6 +280,104 @@ class DemoSeeder extends Seeder
             PilihanJawaban::create(['soal_id' => $soalPost->id, 'teks_pilihan' => 'Profase', 'apakah_benar' => false, 'urutan' => 2]);
             PilihanJawaban::create(['soal_id' => $soalPost->id, 'teks_pilihan' => 'Anafase', 'apakah_benar' => false, 'urutan' => 3]);
             PilihanJawaban::create(['soal_id' => $soalPost->id, 'teks_pilihan' => 'Telofase', 'apakah_benar' => false, 'urutan' => 4]);
+        }
+
+        // 6. Buat 2 Percobaan Demo dengan Esai Menunggu Penilaian Guru
+        $soalEsaiBab1 = Soal::where('kuis_id', $kuisBab1->id)->where('tipe_soal', 'esai')->first();
+        $soalPgBab1 = Soal::where('kuis_id', $kuisBab1->id)->where('tipe_soal', 'pilihan_ganda')->first();
+        $pilihanBenarPg = $soalPgBab1?->pilihanJawaban()->where('apakah_benar', true)->first();
+
+        $siswaAhmad = User::where('username', 'ahmad_fauzi')->first();
+        $siswaSiti = User::where('username', 'siti_rahma')->first();
+
+        if ($soalEsaiBab1 && $siswaAhmad) {
+            $percobaanAhmad = PercobaanKuis::updateOrCreate(
+                [
+                    'kuis_id' => $kuisBab1->id,
+                    'user_id' => $siswaAhmad->id,
+                    'nomor_percobaan' => 1,
+                ],
+                [
+                    'status_pengerjaan' => 'selesai',
+                    'status_kelulusan' => 'lulus',
+                    'esai_menunggu_nilai' => true,
+                    'nilai_otomatis' => 100.00,
+                    'nilai_akhir' => null,
+                    'dibatalkan' => false,
+                    'urutan_soal_teracak' => [$soalPgBab1?->id, $soalEsaiBab1->id],
+                    'waktu_mulai' => now()->subHours(2),
+                    'waktu_selesai' => now()->subHours(2)->addMinutes(10),
+                ]
+            );
+
+            if ($soalPgBab1 && $pilihanBenarPg) {
+                JawabanSiswa::updateOrCreate(
+                    ['percobaan_kuis_id' => $percobaanAhmad->id, 'soal_id' => $soalPgBab1->id],
+                    [
+                        'pilihan_jawaban_id' => $pilihanBenarPg->id,
+                        'poin_diperoleh' => $soalPgBab1->bobot_poin,
+                        'waktu_mulai_soal' => now()->subHours(2),
+                        'waktu_jawab' => now()->subHours(2)->addSeconds(30),
+                    ]
+                );
+            }
+
+            JawabanSiswa::updateOrCreate(
+                ['percobaan_kuis_id' => $percobaanAhmad->id, 'soal_id' => $soalEsaiBab1->id],
+                [
+                    'jawaban_teks' => 'Sel hewan tidak memiliki dinding sel dan kloroplas, bentuknya fleksibel dan memiliki sentriol. Sedangkan sel tumbuhan memiliki dinding sel dari selulosa, plastida/kloroplas untuk fotosintesis, dan vakuola sentral yang berukuran besar.',
+                    'poin_diperoleh' => 0.00,
+                    'catatan_guru' => null,
+                    'dinilai_pada' => null,
+                    'waktu_mulai_soal' => now()->subHours(2)->addMinutes(2),
+                    'waktu_jawab' => now()->subHours(2)->addMinutes(9),
+                ]
+            );
+        }
+
+        if ($soalEsaiBab1 && $siswaSiti) {
+            $percobaanSiti = PercobaanKuis::updateOrCreate(
+                [
+                    'kuis_id' => $kuisBab1->id,
+                    'user_id' => $siswaSiti->id,
+                    'nomor_percobaan' => 1,
+                ],
+                [
+                    'status_pengerjaan' => 'selesai',
+                    'status_kelulusan' => 'lulus',
+                    'esai_menunggu_nilai' => true,
+                    'nilai_otomatis' => 100.00,
+                    'nilai_akhir' => null,
+                    'dibatalkan' => false,
+                    'urutan_soal_teracak' => [$soalPgBab1?->id, $soalEsaiBab1->id],
+                    'waktu_mulai' => now()->subHour(),
+                    'waktu_selesai' => now()->subHour()->addMinutes(8),
+                ]
+            );
+
+            if ($soalPgBab1 && $pilihanBenarPg) {
+                JawabanSiswa::updateOrCreate(
+                    ['percobaan_kuis_id' => $percobaanSiti->id, 'soal_id' => $soalPgBab1->id],
+                    [
+                        'pilihan_jawaban_id' => $pilihanBenarPg->id,
+                        'poin_diperoleh' => $soalPgBab1->bobot_poin,
+                        'waktu_mulai_soal' => now()->subHour(),
+                        'waktu_jawab' => now()->subHour()->addSeconds(25),
+                    ]
+                );
+            }
+
+            JawabanSiswa::updateOrCreate(
+                ['percobaan_kuis_id' => $percobaanSiti->id, 'soal_id' => $soalEsaiBab1->id],
+                [
+                    'jawaban_teks' => "Perbedaan sel hewan dan tumbuhan:\n1. Dinding sel: tumbuhan ada, hewan tidak ada.\n2. Kloroplas: tumbuhan punya kloroplas untuk fotosintesis.\n3. Vakuola: tumbuhan vakuola besar, sel hewan kecil atau tidak ada.",
+                    'poin_diperoleh' => 0.00,
+                    'catatan_guru' => null,
+                    'dinilai_pada' => null,
+                    'waktu_mulai_soal' => now()->subHour()->addMinutes(1),
+                    'waktu_jawab' => now()->subHour()->addMinutes(7),
+                ]
+            );
         }
     }
 }

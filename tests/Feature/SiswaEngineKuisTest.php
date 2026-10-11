@@ -10,7 +10,10 @@ use App\Models\PilihanJawaban;
 use App\Models\Soal;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
 use Tests\TestCase;
 
 class SiswaEngineKuisTest extends TestCase
@@ -51,7 +54,6 @@ class SiswaEngineKuisTest extends TestCase
             'tipe_kuis' => 'pretest',
             'judul' => 'Pretest Pengetahuan Awal',
             'batas_waktu_per_soal' => 60,
-            'status_terbit' => true,
         ]);
 
         $soalPg = Soal::create([
@@ -146,7 +148,6 @@ class SiswaEngineKuisTest extends TestCase
             'tipe_kuis' => 'pretest',
             'judul' => 'Kuis Timer',
             'batas_waktu_per_soal' => 60,
-            'status_terbit' => true,
         ]);
         $soal = Soal::create([
             'kuis_id' => $kuis->id,
@@ -188,11 +189,11 @@ class SiswaEngineKuisTest extends TestCase
     {
         Carbon::setTestNow('2026-10-11 10:00:00');
 
-        $kuis = Kuis::create(['tipe_kuis' => 'pretest', 'judul' => 'Kuis Urutan']);
+        $kuis = Kuis::create(['tipe_kuis' => 'pretest', 'judul' => 'Kuis Urutan', 'acak_soal' => false]);
         $soal1 = Soal::create(['kuis_id' => $kuis->id, 'tipe_soal' => 'pilihan_ganda', 'pertanyaan' => 'S1', 'bobot_poin' => 5, 'urutan' => 1]);
         $soal2 = Soal::create(['kuis_id' => $kuis->id, 'tipe_soal' => 'pilihan_ganda', 'pertanyaan' => 'S2', 'bobot_poin' => 5, 'urutan' => 2]);
-        PilihanJawaban::create(['soal_id' => $soal1->id, 'teks_pilihan' => 'O1', 'apakah_benar' => true, 'urutan' => 1]);
-        PilihanJawaban::create(['soal_id' => $soal2->id, 'teks_pilihan' => 'O2', 'apakah_benar' => true, 'urutan' => 1]);
+        $p1 = PilihanJawaban::create(['soal_id' => $soal1->id, 'teks_pilihan' => 'O1', 'apakah_benar' => true, 'urutan' => 1]);
+        $p2 = PilihanJawaban::create(['soal_id' => $soal2->id, 'teks_pilihan' => 'O2', 'apakah_benar' => true, 'urutan' => 1]);
 
         $this->actingAs($this->siswa1);
         $this->post(route('siswa.kuis.mulai', $kuis));
@@ -200,7 +201,7 @@ class SiswaEngineKuisTest extends TestCase
 
         // Soal aktif saat ini adalah soal 1. Mencoba langsung submit soal 2 harus ditolak 403
         $response = $this->post(route('siswa.percobaan.jawab', [$percobaan, $soal2]), [
-            'pilihan_jawaban_id' => 1,
+            'pilihan_jawaban_id' => $p2->id,
         ]);
         $response->assertForbidden();
     }
@@ -362,5 +363,50 @@ class SiswaEngineKuisTest extends TestCase
         $resLanjut = $this->get(route('siswa.percobaan.hasil', $pLanjut));
         $resLanjut->assertOk();
         $resLanjut->assertSee('BELUM LULUS (DAPAT MELANJUTKAN)');
+    }
+
+    public function test_galat_419_sesi_berakhir_menampilkan_halaman_ramah_dan_mengingat_tujuan(): void
+    {
+        $kuis = Kuis::create([
+            'tipe_kuis' => 'pretest',
+            'judul' => 'Pretest Sesi',
+        ]);
+        $soal = Soal::create([
+            'kuis_id' => $kuis->id,
+            'tipe_soal' => 'pilihan_ganda',
+            'pertanyaan' => 'Soal 1',
+            'bobot_poin' => 10,
+            'urutan' => 1,
+        ]);
+
+        $this->actingAs($this->siswa1);
+        $this->post(route('siswa.kuis.mulai', $kuis));
+        $percobaan = PercobaanKuis::where('kuis_id', $kuis->id)->first();
+
+        $urlSoal = route('siswa.percobaan.soal', $percobaan);
+
+        // Uji handler TokenMismatchException (galat 419 sesi berakhir)
+        $this->get('/'); // Inisialisasi sesi
+
+        $request = Request::create(route('siswa.percobaan.jawab', [$percobaan, $soal]), 'POST');
+        $request->headers->set('referer', $urlSoal);
+        $request->setLaravelSession(session()->driver());
+
+        $handler = app(ExceptionHandler::class);
+        $response = $handler->render($request, new TokenMismatchException('CSRF token mismatch.'));
+
+        $this->assertEquals(419, $response->getStatusCode());
+        $this->assertStringContainsString('Sesi Kamu Sudah Berakhir', $response->getContent());
+        $this->assertStringContainsString('Masuk Kembali ke LMS', $response->getContent());
+        $this->assertEquals($urlSoal, session('url.intended'));
+
+        // Uji dengan Referer dari host luar (mis. phishing/situs eksternal) -> fallback ke beranda siswa
+        $requestLuar = Request::create(route('siswa.percobaan.jawab', [$percobaan, $soal]), 'POST');
+        $requestLuar->headers->set('referer', 'https://malicious-site.com/kuis/curi-token');
+        $requestLuar->setLaravelSession(session()->driver());
+
+        $responseLuar = $handler->render($requestLuar, new TokenMismatchException('CSRF token mismatch.'));
+        $this->assertEquals(419, $responseLuar->getStatusCode());
+        $this->assertEquals(route('siswa.beranda'), session('url.intended'));
     }
 }

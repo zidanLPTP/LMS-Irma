@@ -4,6 +4,36 @@
             sisaDetik: {{ $sisaDetik !== null ? $sisaDetik : 'null' }},
             batasTotal: {{ $percobaan->kuis->batasWaktuEfektif() }},
             terkirim: false,
+            kunciDraf: 'draf_esai_{{ $percobaan->id }}_{{ $soalAktif->id }}',
+            inisialisasiDrafEsai() {
+                @if ($soalAktif->tipe_soal === 'esai')
+                try {
+                    const textarea = document.getElementById('jawaban_teks');
+                    if (textarea) {
+                        const drafTersimpan = localStorage.getItem(this.kunciDraf);
+                        if (drafTersimpan && !textarea.value) {
+                            textarea.value = drafTersimpan;
+                        }
+                    }
+                } catch (e) {
+                    // Abaikan jika localStorage tidak diizinkan atau kuota penuh
+                }
+                @endif
+            },
+            simpanDrafEsai(nilai) {
+                @if ($soalAktif->tipe_soal === 'esai')
+                try {
+                    localStorage.setItem(this.kunciDraf, nilai);
+                } catch (e) {}
+                @endif
+            },
+            hapusDrafEsai() {
+                @if ($soalAktif->tipe_soal === 'esai')
+                try {
+                    localStorage.removeItem(this.kunciDraf);
+                } catch (e) {}
+                @endif
+            },
             mulaiTimer() {
                 if (this.sisaDetik === null) return;
                 const interval = setInterval(() => {
@@ -20,7 +50,7 @@
                 }, 1000);
             }
          }"
-         x-init="mulaiTimer()">
+         x-init="mulaiTimer(); inisialisasiDrafEsai()">
 
         <!-- Header Kuis: Indikator Soal & Timer -->
         <div class="space-y-3">
@@ -81,7 +111,7 @@
             </div>
 
             <form id="form-jawab-soal" method="POST" action="{{ route('siswa.percobaan.jawab', [$percobaan, $soalAktif]) }}"
-                  @submit="terkirim = true" class="space-y-6">
+                  @submit="terkirim = true; hapusDrafEsai()" class="space-y-6">
                 @csrf
 
                 <!-- 1. Pilihan Ganda: Radio Card Besar Mudah Diketuk -->
@@ -119,6 +149,7 @@
                             Tulis Uraian / Penjelasan Anda
                         </label>
                         <textarea id="jawaban_teks" name="jawaban_teks" rows="7"
+                                  @input="simpanDrafEsai($event.target.value)"
                                   placeholder="Ketik penjelasan mendalam Anda..."
                                   class="w-full text-sm text-ink rounded-2xl border border-border p-4 bg-white focus:outline-none focus:ring-2 focus:ring-green-700 leading-relaxed">{{ old('jawaban_teks', $jawaban->jawaban_teks) }}</textarea>
                     </div>

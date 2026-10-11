@@ -62,6 +62,12 @@ class PelacakAksesService
         }
 
         $selisihDetik = abs((int) $log->aktivitas_terakhir->diffInSeconds($sekarang, false));
+        $jedaMinimal = (int) config('lms.jeda_minimal_tulis_detik', 5);
+
+        // Jika jeda kurang dari 5 detik, abaikan pembaruan (cegah tulis berlebihan; selisih tetap terhitung nanti)
+        if ($selisihDetik < $jedaMinimal) {
+            return $log;
+        }
 
         // Jika jeda masih dalam batas toleransi (<= 120 detik)
         if ($selisihDetik <= $batasJeda) {

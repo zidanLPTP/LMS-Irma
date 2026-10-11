@@ -62,7 +62,6 @@ class SiswaBelajarTest extends TestCase
         $pretest = Kuis::create([
             'tipe_kuis' => 'pretest',
             'judul' => 'Pretest Kemampuan Awal',
-            'status_terbit' => true,
         ]);
 
         $bab1 = Bab::create(['judul' => 'Bab 1 Sel', 'urutan' => 1, 'status_terbit' => true]);
@@ -71,7 +70,6 @@ class SiswaBelajarTest extends TestCase
             'tipe_kuis' => 'kuis_bab',
             'judul' => 'Kuis Bab 1',
             'nilai_lulus' => 65.00,
-            'status_terbit' => true,
         ]);
         $soalOto = $kuisBab1->soal()->create([
             'tipe_soal' => 'pilihan_ganda',
@@ -88,7 +86,6 @@ class SiswaBelajarTest extends TestCase
             'tipe_kuis' => 'kuis_bab',
             'judul' => 'Kuis Bab 3',
             'nilai_lulus' => 65.00,
-            'status_terbit' => true,
         ]);
         $kuisBab3->soal()->create([
             'tipe_soal' => 'pilihan_ganda',
@@ -100,20 +97,19 @@ class SiswaBelajarTest extends TestCase
         $posttest = Kuis::create([
             'tipe_kuis' => 'posttest',
             'judul' => 'Posttest Akhir',
-            'status_terbit' => true,
         ]);
 
-        // Siswa buka beranda: Pretest terbuka, Bab 1 & Bab 3 terkunci, Bab draf TIDAK tampil
+        // Kondisi 1: Pretest terbuka (tautan ada). Bab 1 dan Bab 3 terkunci (tautan TIDAK ada). Bab 2 draf tidak tampil sama sekali.
         $res1 = $this->actingAs($this->siswa)->get(route('siswa.beranda'));
         $res1->assertOk();
         $res1->assertSee('Pretest Kemampuan Awal');
-        $res1->assertSee('Bab 1 Sel');
-        $res1->assertSee('Bab 3 Genetika');
+        $res1->assertSee(route('siswa.kuis.show', $pretest)); // Tautan pretest terbuka ada
+        $res1->assertDontSee(route('siswa.bab.show', $bab1)); // Tautan Bab 1 belum ada (terkunci)
+        $res1->assertDontSee(route('siswa.bab.show', $bab3)); // Tautan Bab 3 belum ada (terkunci)
         $res1->assertDontSee('Bab 2 Draf'); // Bab draf tidak tampil
-        $res1->assertSee('Terbuka');
         $res1->assertSee('Terkunci');
 
-        // Kondisi 2: Pretest selesai -> Bab 1 terbuka
+        // Kondisi 2: Pretest selesai -> Bab 1 terbuka (tautan ada), Bab 3 tetap terkunci (tautan TIDAK ada)
         PercobaanKuis::create([
             'kuis_id' => $pretest->id,
             'user_id' => $this->siswa->id,
@@ -127,9 +123,10 @@ class SiswaBelajarTest extends TestCase
         $res2 = $this->get(route('siswa.beranda'));
         $res2->assertOk();
         $res2->assertSee('Selesai');
-        $res2->assertSee('Mulai Belajar'); // Tombol buka Bab 1
+        $res2->assertSee(route('siswa.bab.show', $bab1)); // Bab 1 terbuka: tautan tampil
+        $res2->assertDontSee(route('siswa.bab.show', $bab3)); // Bab 3 masih terkunci: tautan tidak ada
 
-        // Kondisi 3: Bab 1 lulus (memiliki kuis yang lulus)
+        // Kondisi 3: Bab 1 lulus -> Bab 2 draf dilewati dari urutan -> Bab 3 terbuka (tautan tampil nyata)
         PercobaanKuis::create([
             'kuis_id' => $kuisBab1->id,
             'user_id' => $this->siswa->id,
@@ -143,10 +140,11 @@ class SiswaBelajarTest extends TestCase
             'waktu_selesai' => now(),
         ]);
 
-        // Karena Bab 2 draf dilewati dari urutan, maka Bab 3 otomatis terbuka
         $res3 = $this->get(route('siswa.beranda'));
         $res3->assertOk();
         $res3->assertSee('Bab 3 Genetika');
+        $res3->assertSee(route('siswa.bab.show', $bab3)); // Bukti nyata: Bab 3 terbuka memiliki tautan aktif
+        $res3->assertDontSee(route('siswa.kuis.show', $posttest)); // Posttest masih terkunci: tautan tidak ada
     }
 
     public function test_bab_terkunci_ditolak_dan_diarahkan_ke_beranda(): void

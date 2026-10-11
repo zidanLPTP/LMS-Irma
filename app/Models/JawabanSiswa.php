@@ -45,4 +45,9 @@ class JawabanSiswa extends Model
     {
         return $this->belongsTo(PilihanJawaban::class, 'pilihan_jawaban_id');
     }
+
+    public function riwayatNilaiEsai()
+    {
+        return $this->hasMany(RiwayatNilaiEsai::class, 'jawaban_siswa_id');
+    }
 }

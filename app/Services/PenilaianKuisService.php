@@ -6,6 +6,7 @@ use App\Models\JawabanSiswa;
 use App\Models\Kuis;
 use App\Models\PercobaanKuis;
 use App\Models\PilihanJawaban;
+use App\Models\RiwayatNilaiEsai;
 use App\Models\Soal;
 use App\Models\User;
 use DomainException;
@@ -378,7 +379,7 @@ class PenilaianKuisService
     /**
      * 8. Penilaian manual esai oleh admin/guru.
      */
-    public function nilaiEsai(JawabanSiswa $jawaban, float $poin, ?string $catatan = null): JawabanSiswa
+    public function nilaiEsai(JawabanSiswa $jawaban, float $poin, ?string $catatan = null, ?User $admin = null): JawabanSiswa
     {
         $soal = $jawaban->soal;
         if (! $soal->isEsai()) {
@@ -389,12 +390,29 @@ class PenilaianKuisService
             throw new InvalidArgumentException("Poin harus berada pada rentang 0 sampai {$soal->bobot_poin}.");
         }
 
-        return DB::transaction(function () use ($jawaban, $poin, $catatan) {
+        return DB::transaction(function () use ($jawaban, $poin, $catatan, $admin) {
+            $poinLama = $jawaban->poin_diperoleh;
+            $catatanLama = $jawaban->catatan_guru;
+            $sudahPernahDinilai = ! is_null($jawaban->dinilai_pada);
+
             $jawaban->update([
                 'poin_diperoleh' => $poin,
                 'catatan_guru' => $catatan,
                 'dinilai_pada' => now(),
             ]);
+
+            // Jika ini penilaian koreksi atau dilakukan oleh admin, catat ke tabel riwayat_nilai_esai
+            if ($admin || $sudahPernahDinilai) {
+                RiwayatNilaiEsai::create([
+                    'jawaban_siswa_id' => $jawaban->id,
+                    'admin_id' => $admin ? $admin->id : auth()->id(),
+                    'poin_lama' => $poinLama,
+                    'poin_baru' => $poin,
+                    'catatan_lama' => $catatanLama,
+                    'catatan_baru' => $catatan,
+                    'created_at' => now(),
+                ]);
+            }
 
             $percobaan = $jawaban->percobaanKuis;
             $kuis = $percobaan->kuis;

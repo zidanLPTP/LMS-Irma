@@ -24,4 +24,12 @@ class PercobaanKuisPolicy
             && $percobaan->status_pengerjaan === 'sedang_mengerjakan'
             && ! $percobaan->dibatalkan;
     }
+
+    /**
+     * Pastikan hanya admin yang berhak menilai esai.
+     */
+    public function nilaiEsai(User $user, PercobaanKuis $percobaan): bool
+    {
+        return $user->isAdmin();
+    }
 }

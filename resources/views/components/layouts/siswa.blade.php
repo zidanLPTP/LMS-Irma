@@ -12,10 +12,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/detak-jantung.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="h-full font-sans text-ink antialiased bg-bg flex flex-col">
+<body class="h-full font-sans text-ink antialiased bg-bg flex flex-col"
+    data-url-detak="{{ route('siswa.detak') }}"
+    data-interval-detak="{{ config('lms.interval_detak_detik', 45) }}">
     <!-- Bilah Atas Siswa Sesuai Spesifikasi -->
     <header class="bg-white border-b border-border sticky top-0 z-30">
         <div class="max-w-[1000px] mx-auto px-4 h-16 flex items-center justify-between">
@@ -34,7 +36,7 @@
                     </span>
                 </div>
 
-                <form method="POST" action="{{ route('keluar') }}" class="inline">
+                <form method="POST" action="{{ route('keluar') }}" class="inline" onsubmit="try { Object.keys(localStorage).forEach(k => { if (k.startsWith('draf_esai_')) localStorage.removeItem(k); }); } catch (e) {}">
                     @csrf
                     <x-tombol tipe="garis" class="!min-h-[38px] !px-3.5 !py-1.5 text-xs font-bold">
                         Keluar

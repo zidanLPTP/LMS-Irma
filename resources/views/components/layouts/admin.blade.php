@@ -56,6 +56,20 @@
                 <x-ikon nama="clipboard-list" ukuran="18" />
                 <span>Kuis dan Soal</span>
             </a>
+            @php
+                $jumlahAntreanEsai = \App\Models\PercobaanKuis::where('status_pengerjaan', 'selesai')->where('dibatalkan', false)->where('esai_menunggu_nilai', true)->count();
+            @endphp
+            <a href="{{ route('admin.penilaian-esai.index') }}" class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.penilaian-esai.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                <div class="flex items-center gap-2">
+                    <x-ikon nama="pencil" ukuran="18" />
+                    <span>Penilaian Esai</span>
+                </div>
+                @if ($jumlahAntreanEsai > 0)
+                    <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-black rounded-full bg-amber-500 text-white">
+                        {{ $jumlahAntreanEsai }}
+                    </span>
+                @endif
+            </a>
         </div>
     </header>
 
@@ -75,6 +89,17 @@
                 <a href="{{ route('admin.kuis.index') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.kuis.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
                     <x-ikon nama="clipboard-list" ukuran="20" />
                     <span>Kuis dan Soal</span>
+                </a>
+                <a href="{{ route('admin.penilaian-esai.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.penilaian-esai.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <div class="flex items-center gap-2">
+                        <x-ikon nama="pencil" ukuran="20" />
+                        <span>Penilaian Esai</span>
+                    </div>
+                    @if ($jumlahAntreanEsai > 0)
+                        <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-black rounded-full bg-amber-500 text-white">
+                            {{ $jumlahAntreanEsai }}
+                        </span>
+                    @endif
                 </a>
             </div>
         </aside>

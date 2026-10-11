@@ -75,15 +75,32 @@
                 @endif
 
                 <!-- Status Nilai Akhir / Menunggu Esai -->
-                <div class="pt-3 border-t border-border text-xs">
+                <div class="pt-3 border-t border-border text-xs space-y-2">
                     @if ($percobaan->esai_menunggu_nilai)
-                        <span class="font-bold text-amber-700">
+                        <span class="block font-bold text-amber-700">
                             Nilai akhir: menunggu penilaian esai
                         </span>
                     @elseif (! is_null($percobaan->nilai_akhir))
-                        <span class="font-bold text-ink">
+                        <span class="block font-bold text-ink text-sm">
                             Nilai akhir: {{ number_format($percobaan->nilai_akhir, 0) }}%
                         </span>
+                    @endif
+
+                    @php
+                        $jawabanEsaiDinilai = $percobaan->jawabanSiswa->filter(fn($j) => !empty($j->catatan_guru));
+                    @endphp
+                    @if ($jawabanEsaiDinilai->isNotEmpty())
+                        <div class="pt-2 text-left bg-surface rounded-xl p-3 border border-border space-y-2">
+                            <span class="text-xs font-bold text-muted uppercase tracking-wider block">
+                                Catatan Guru untuk Esai:
+                            </span>
+                            @foreach ($jawabanEsaiDinilai as $jwb)
+                                <div class="text-xs text-ink bg-white p-2.5 rounded-lg border border-border">
+                                    <span class="font-bold text-muted block mb-1">{{ $jwb->soal->pertanyaan ?? 'Soal Esai' }}:</span>
+                                    <p class="italic text-ink">"{{ $jwb->catatan_guru }}"</p>
+                                </div>
+                            @endforeach
+                        </div>
                     @endif
                 </div>
             </div>
