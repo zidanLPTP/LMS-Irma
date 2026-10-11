@@ -95,9 +95,10 @@
                             </p>
                         </div>
                         <div>
-                            <button type="button" disabled class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white text-muted border border-border cursor-not-allowed">
-                                <span>Kuis Segera Tersedia</span>
-                            </button>
+                            <x-tombol tipe="utama" href="{{ route('siswa.kuis.show', $kuis) }}" class="!min-h-[40px] !px-5 text-xs font-bold">
+                                <span>Buka Kuis Bab</span>
+                                <x-ikon nama="arrow-right" ukuran="16" />
+                            </x-tombol>
                         </div>
                     </div>
                 </x-kartu>

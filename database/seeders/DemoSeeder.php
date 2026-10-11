@@ -101,17 +101,37 @@ class DemoSeeder extends Seeder
         );
 
         if ($pretest->soal()->count() === 0) {
-            $soalPre = Soal::create([
+            $soalPre1 = Soal::create([
                 'kuis_id' => $pretest->id,
                 'tipe_soal' => 'pilihan_ganda',
                 'pertanyaan' => 'Unit struktural dan fungsional terkecil dari makhluk hidup disebut...',
                 'bobot_poin' => 10,
                 'urutan' => 1,
             ]);
-            PilihanJawaban::create(['soal_id' => $soalPre->id, 'teks_pilihan' => 'Sel', 'apakah_benar' => true, 'urutan' => 1]);
-            PilihanJawaban::create(['soal_id' => $soalPre->id, 'teks_pilihan' => 'Jaringan', 'apakah_benar' => false, 'urutan' => 2]);
-            PilihanJawaban::create(['soal_id' => $soalPre->id, 'teks_pilihan' => 'Organ', 'apakah_benar' => false, 'urutan' => 3]);
-            PilihanJawaban::create(['soal_id' => $soalPre->id, 'teks_pilihan' => 'Sistem Organ', 'apakah_benar' => false, 'urutan' => 4]);
+            PilihanJawaban::create(['soal_id' => $soalPre1->id, 'teks_pilihan' => 'Sel', 'apakah_benar' => true, 'urutan' => 1]);
+            PilihanJawaban::create(['soal_id' => $soalPre1->id, 'teks_pilihan' => 'Jaringan', 'apakah_benar' => false, 'urutan' => 2]);
+            PilihanJawaban::create(['soal_id' => $soalPre1->id, 'teks_pilihan' => 'Organ', 'apakah_benar' => false, 'urutan' => 3]);
+            PilihanJawaban::create(['soal_id' => $soalPre1->id, 'teks_pilihan' => 'Sistem Organ', 'apakah_benar' => false, 'urutan' => 4]);
+
+            $soalPre2 = Soal::create([
+                'kuis_id' => $pretest->id,
+                'tipe_soal' => 'pilihan_ganda',
+                'pertanyaan' => 'Organel sel yang berfungsi sebagai penghasil energi (respirasi seluler) adalah...',
+                'bobot_poin' => 10,
+                'urutan' => 2,
+            ]);
+            PilihanJawaban::create(['soal_id' => $soalPre2->id, 'teks_pilihan' => 'Mitokondria', 'apakah_benar' => true, 'urutan' => 1]);
+            PilihanJawaban::create(['soal_id' => $soalPre2->id, 'teks_pilihan' => 'Ribosom', 'apakah_benar' => false, 'urutan' => 2]);
+            PilihanJawaban::create(['soal_id' => $soalPre2->id, 'teks_pilihan' => 'Badan Golgi', 'apakah_benar' => false, 'urutan' => 3]);
+            PilihanJawaban::create(['soal_id' => $soalPre2->id, 'teks_pilihan' => 'Lisosom', 'apakah_benar' => false, 'urutan' => 4]);
+
+            Soal::create([
+                'kuis_id' => $pretest->id,
+                'tipe_soal' => 'esai',
+                'pertanyaan' => 'Jelaskan perbedaan mendasar antara sel hewan dan sel tumbuhan beserta contoh organel khususnya!',
+                'bobot_poin' => 20,
+                'urutan' => 3,
+            ]);
         }
 
         // 4. Buat Bab 1

@@ -39,9 +39,10 @@
                                     <x-ikon nama="arrow-right" ukuran="16" />
                                 </x-tombol>
                             @else
-                                <button type="button" disabled class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-surface text-muted border border-border cursor-not-allowed">
-                                    <span>{{ $langkahLanjutan['judul'] }} (Segera tersedia)</span>
-                                </button>
+                                <x-tombol tipe="utama" href="{{ route('siswa.kuis.show', $langkahLanjutan['model']) }}" class="w-full justify-center !min-h-[42px] text-xs">
+                                    <span>Kerjakan {{ $langkahLanjutan['judul'] }}</span>
+                                    <x-ikon nama="arrow-right" ukuran="16" />
+                                </x-tombol>
                             @endif
                         </div>
                     @else
@@ -129,9 +130,10 @@
                                         <x-ikon nama="arrow-right" ukuran="14" />
                                     </x-tombol>
                                 @else
-                                    <button type="button" disabled class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-surface text-muted border border-border cursor-not-allowed">
-                                        <span>Kuis Segera Tersedia</span>
-                                    </button>
+                                    <x-tombol tipe="utama" href="{{ route('siswa.kuis.show', $item['model']) }}" class="!min-h-[38px] !px-4 !py-1.5 text-xs font-bold">
+                                        <span>Kerjakan Kuis</span>
+                                        <x-ikon nama="arrow-right" ukuran="14" />
+                                    </x-tombol>
                                 @endif
                             @else
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-surface text-muted border border-border">

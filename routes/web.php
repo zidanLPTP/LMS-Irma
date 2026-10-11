@@ -39,6 +39,14 @@ Route::middleware(['auth', 'peran:siswa'])->prefix('siswa')->name('siswa.')->gro
     Route::get('/beranda', [SiswaBerandaController::class, 'index'])->name('beranda');
     Route::get('/bab/{bab}', [App\Http\Controllers\Siswa\BabController::class, 'show'])->name('bab.show');
     Route::get('/bab/{bab}/materi/{materi}', [App\Http\Controllers\Siswa\MateriController::class, 'show'])->name('bab.materi.show');
+
+    // Engine Kuis Siswa
+    Route::get('/kuis/{kuis}', [App\Http\Controllers\Siswa\KuisController::class, 'show'])->name('kuis.show');
+    Route::post('/kuis/{kuis}/mulai', [App\Http\Controllers\Siswa\KuisController::class, 'mulai'])->name('kuis.mulai');
+    Route::get('/percobaan/{percobaan}/soal', [App\Http\Controllers\Siswa\KuisController::class, 'soal'])->name('percobaan.soal');
+    Route::post('/percobaan/{percobaan}/soal/{soal}/jawab', [App\Http\Controllers\Siswa\KuisController::class, 'jawab'])->name('percobaan.jawab');
+    Route::post('/percobaan/{percobaan}/serahkan', [App\Http\Controllers\Siswa\KuisController::class, 'serahkan'])->name('percobaan.serahkan');
+    Route::get('/percobaan/{percobaan}/hasil', [App\Http\Controllers\Siswa\KuisController::class, 'hasil'])->name('percobaan.hasil');
 });
 
 // Penyaji PDF Privat (Bisa diakses Siswa Berhak atau Admin yang telah login)

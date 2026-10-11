@@ -114,9 +114,10 @@
                             <span>Selesai &bull; Kembali ke Bab</span>
                         </x-tombol>
                         @if ($bab->kuis)
-                            <button type="button" disabled class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-surface text-muted border border-border cursor-not-allowed">
-                                <span>Kuis Bab (Segera tersedia)</span>
-                            </button>
+                            <x-tombol tipe="utama" href="{{ route('siswa.kuis.show', $bab->kuis) }}" class="!min-h-[42px] text-xs font-bold">
+                                <span>Lanjut ke Kuis Bab</span>
+                                <x-ikon nama="arrow-right" ukuran="16" />
+                            </x-tombol>
                         @endif
                     </div>
                 @endif
