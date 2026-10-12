@@ -27,6 +27,7 @@ class User extends Authenticatable
         'peran',
         'kelas',
         'aktif',
+        'wajib_ganti_password',
     ];
 
     /**
@@ -50,6 +51,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'aktif' => 'boolean',
+            'wajib_ganti_password' => 'boolean',
         ];
     }
 
@@ -75,6 +77,14 @@ class User extends Authenticatable
     public function logAkses(): HasMany
     {
         return $this->hasMany(LogAkses::class, 'user_id');
+    }
+
+    /**
+     * Relasi ke riwayat tindakan admin yang diterima siswa ini.
+     */
+    public function riwayatTindakan(): HasMany
+    {
+        return $this->hasMany(RiwayatTindakanAdmin::class, 'siswa_id');
     }
 
     /**

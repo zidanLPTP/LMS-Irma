@@ -1,15 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Detak Jantung Heartbeat Siswa (E2E)', () => {
-  test('Siswa demo masuk, page clock dimajukan 50 detik, verifikasi request POST /detak 204', async ({ page }) => {
-    // Siapkan penangkap request ke endpoint /detak
-    let detakRequestDiterima = false;
-    let detakStatus = 0;
+  test('Siswa demo masuk, minimal dua POST /detak 204, dan berhenti saat diam 31 menit lalu lanjut setelah interaksi', async ({ page }) => {
+    await page.clock.install();
 
+    let jumlahDetak = 0;
     page.on('response', (response) => {
-      if (response.url().includes('/detak') && response.request().method() === 'POST') {
-        detakRequestDiterima = true;
-        detakStatus = response.status();
+      if (response.url().includes('/detak') && response.request().method() === 'POST' && response.status() === 204) {
+        jumlahDetak++;
       }
     });
 
@@ -19,24 +17,39 @@ test.describe('Detak Jantung Heartbeat Siswa (E2E)', () => {
     await page.fill('input[name="password"]', 'password123');
     await page.click('button[type="submit"]');
 
-    // 2. Berada di beranda siswa
-    await expect(page).toHaveURL(/\/siswa\/beranda/);
+    // Tunggu request /detak pertama saat beranda dimuat
+    await page.waitForResponse(
+      (res) => res.url().includes('/detak') && res.request().method() === 'POST' && res.status() === 204
+    );
 
-    // Saat halaman dimuat, script detak-jantung.js langsung mengirim 1 detak pertama
-    // Tunggu sejenak agar request awal tercatat
-    await page.waitForTimeout(1000);
-    expect(detakRequestDiterima).toBeTruthy();
-    expect(detakStatus).toBe(204);
+    expect(jumlahDetak).toBeGreaterThanOrEqual(1);
 
-    // Reset flag untuk pengujian interval berikutnya
-    detakRequestDiterima = false;
+    // 2. Majukan waktu 50 detik (melewati interval 45 detik)
+    // Tunggu response /detak kedua
+    const responsePromise = page.waitForResponse(
+      (res) => res.url().includes('/detak') && res.request().method() === 'POST' && res.status() === 204
+    );
+    await page.clock.runFor(50000);
+    await responsePromise;
 
-    // 3. Majukan waktu jika didukung clock, atau tunggu interval detak
-    // Di Playwright clock dapat dimajukan atau tunggu
-    if (page.clock) {
-      await page.clock.fastForward(50000); // majukan 50 detik
-    } else {
-      await page.waitForTimeout(2000);
-    }
+    expect(jumlahDetak).toBeGreaterThanOrEqual(2);
+
+    // 3. Majukan waktu 31 menit tanpa interaksi
+    await page.clock.runFor(31 * 60 * 1000);
+    const detakSaatDiam = jumlahDetak;
+
+    // Majukan lagi 2 menit dalam keadaan diam -> tidak boleh ada detak baru
+    await page.clock.runFor(2 * 60 * 1000);
+    expect(jumlahDetak).toBe(detakSaatDiam);
+
+    // 4. Lakukan interaksi (klik mouse) untuk membangunkan dari status diam
+    const detakBangunPromise = page.waitForResponse(
+      (res) => res.url().includes('/detak') && res.request().method() === 'POST' && res.status() === 204
+    );
+    await page.mouse.click(150, 150);
+    await page.clock.runFor(500);
+    await detakBangunPromise;
+
+    expect(jumlahDetak).toBeGreaterThan(detakSaatDiam);
   });
 });

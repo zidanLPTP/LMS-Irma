@@ -3,7 +3,10 @@
 use App\Http\Controllers\Admin\BabController;
 use App\Http\Controllers\Admin\BerandaController as AdminBerandaController;
 use App\Http\Controllers\Admin\KuisController;
+use App\Http\Controllers\Admin\LaporanAksesController;
+use App\Http\Controllers\Admin\LaporanNilaiController;
 use App\Http\Controllers\Admin\MateriController;
+use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\Admin\PenilaianEsaiController;
 use App\Http\Controllers\Admin\SoalController;
 use App\Http\Controllers\Auth\DaftarController;
@@ -11,6 +14,7 @@ use App\Http\Controllers\Auth\MasukController;
 use App\Http\Controllers\PenyajiMateriPdfController;
 use App\Http\Controllers\Siswa\BerandaController as SiswaBerandaController;
 use App\Http\Controllers\Siswa\DetakJantungController;
+use App\Http\Controllers\Siswa\PasswordController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,7 +41,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/keluar', [MasukController::class, 'destroy'])->middleware('auth')->name('keluar');
 
 // Area Siswa
-Route::middleware(['auth', 'peran:siswa', 'catat.aktivitas'])->prefix('siswa')->name('siswa.')->group(function () {
+Route::middleware(['auth', 'peran:siswa', 'periksa.status', 'catat.aktivitas'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/beranda', [SiswaBerandaController::class, 'index'])->name('beranda');
     Route::get('/bab/{bab}', [App\Http\Controllers\Siswa\BabController::class, 'show'])->name('bab.show');
     Route::get('/bab/{bab}/materi/{materi}', [App\Http\Controllers\Siswa\MateriController::class, 'show'])->name('bab.materi.show');
@@ -49,6 +53,10 @@ Route::middleware(['auth', 'peran:siswa', 'catat.aktivitas'])->prefix('siswa')->
     Route::post('/percobaan/{percobaan}/soal/{soal}/jawab', [App\Http\Controllers\Siswa\KuisController::class, 'jawab'])->name('percobaan.jawab');
     Route::post('/percobaan/{percobaan}/serahkan', [App\Http\Controllers\Siswa\KuisController::class, 'serahkan'])->name('percobaan.serahkan');
     Route::get('/percobaan/{percobaan}/hasil', [App\Http\Controllers\Siswa\KuisController::class, 'hasil'])->name('percobaan.hasil');
+
+    // Ganti Password Siswa
+    Route::get('/password', [PasswordController::class, 'edit'])->name('password.edit');
+    Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
 });
 
 // Endpoint Detak Jantung (Heartbeat) - Auth (siswa dicatat, admin 204), Throttle 10 req/menit
@@ -84,4 +92,17 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
     Route::get('penilaian-esai', [PenilaianEsaiController::class, 'index'])->name('penilaian-esai.index');
     Route::get('penilaian-esai/{percobaan}', [PenilaianEsaiController::class, 'show'])->name('penilaian-esai.show');
     Route::post('penilaian-esai/{percobaan}', [PenilaianEsaiController::class, 'simpan'])->name('penilaian-esai.simpan');
+
+    // Laporan Admin (Akses & Nilai)
+    Route::get('laporan/akses', [LaporanAksesController::class, 'index'])->name('laporan.akses');
+    Route::get('laporan/akses/ekspor', [LaporanAksesController::class, 'ekspor'])->name('laporan.akses.ekspor');
+    Route::get('laporan/nilai', [LaporanNilaiController::class, 'index'])->name('laporan.nilai');
+    Route::get('laporan/nilai/ekspor', [LaporanNilaiController::class, 'ekspor'])->name('laporan.nilai.ekspor');
+
+    // Kelola Pengguna (Siswa)
+    Route::get('pengguna/ganda', [PenggunaController::class, 'ganda'])->name('pengguna.ganda');
+    Route::resource('pengguna', PenggunaController::class)->parameters(['pengguna' => 'pengguna']);
+    Route::patch('pengguna/{pengguna}/toggle-aktif', [PenggunaController::class, 'toggleAktif'])->name('pengguna.toggle-aktif');
+    Route::post('pengguna/{pengguna}/reset-password', [PenggunaController::class, 'resetPassword'])->name('pengguna.reset-password');
+    Route::post('pengguna/{pengguna}/reset-kesempatan', [PenggunaController::class, 'resetKesempatan'])->name('pengguna.reset-kesempatan');
 });

@@ -6,7 +6,7 @@ test.describe('Smoke Test Engine Kuis Siswa (Mobile 375x667)', () => {
     await page.goto('/masuk');
     await expect(page.locator('h1')).toContainText('Masuk ke LMS');
 
-    await page.fill('input[name="login"]', 'ahmad_fauzi');
+    await page.fill('input[name="login"]', 'budi_pratama');
     await page.fill('input[name="password"]', 'password123');
     await page.screenshot({ path: 'tests/e2e/hasil/01-login-form.png', fullPage: true });
 
@@ -14,7 +14,7 @@ test.describe('Smoke Test Engine Kuis Siswa (Mobile 375x667)', () => {
 
     // 2. Beranda siswa
     await expect(page).toHaveURL(/\/siswa\/beranda/);
-    await expect(page.locator('body')).toContainText('Ahmad Fauzi');
+    await expect(page.locator('body')).toContainText('Budi Pratama');
     await page.screenshot({ path: 'tests/e2e/hasil/02-beranda.png', fullPage: true });
 
     // 3. Masuk ke halaman pengantar Pretest

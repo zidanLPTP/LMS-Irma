@@ -69,11 +69,18 @@ class DemoSeeder extends Seeder
             file_put_contents($pdfPathLengkap, $out);
         }
 
-        // 2. Buat 3 Siswa Contoh
+        // 2. Buat Siswa Contoh (termasuk nonaktif, nama kembar, dan tanpa data)
         $siswaData = [
-            ['nama_lengkap' => 'Ahmad Fauzi', 'username' => 'ahmad_fauzi', 'email' => 'ahmad@siswa.test', 'kelas' => 'XI MIPA 1'],
-            ['nama_lengkap' => 'Siti Rahmawati', 'username' => 'siti_rahma', 'email' => 'siti@siswa.test', 'kelas' => 'XI MIPA 1'],
-            ['nama_lengkap' => 'Budi Pratama', 'username' => 'budi_pratama', 'email' => 'budi@siswa.test', 'kelas' => 'XI MIPA 2'],
+            ['nama_lengkap' => 'Ahmad Fauzi', 'username' => 'ahmad_fauzi', 'email' => 'ahmad@siswa.test', 'kelas' => 'XI MIPA 1', 'aktif' => true],
+            ['nama_lengkap' => 'Siti Rahmawati', 'username' => 'siti_rahma', 'email' => 'siti@siswa.test', 'kelas' => 'XI MIPA 1', 'aktif' => true],
+            ['nama_lengkap' => 'Budi Pratama', 'username' => 'budi_pratama', 'email' => 'budi@siswa.test', 'kelas' => 'XI MIPA 2', 'aktif' => true],
+            // Siswa demo nonaktif
+            ['nama_lengkap' => 'Doni Saputra', 'username' => 'doni_nonaktif', 'email' => 'doni@siswa.test', 'kelas' => 'XI MIPA 2', 'aktif' => false],
+            // Dua siswa dengan nama kembar (uji fitur akun ganda)
+            ['nama_lengkap' => 'Rina Wijaya', 'username' => 'rina_wijaya_1', 'email' => 'rina1@siswa.test', 'kelas' => 'XI MIPA 3', 'aktif' => true],
+            ['nama_lengkap' => 'rina wijaya', 'username' => 'rina_wijaya_2', 'email' => 'rina2@siswa.test', 'kelas' => 'XI MIPA 3', 'aktif' => true],
+            // Siswa baru tanpa data apapun (bisa dihapus)
+            ['nama_lengkap' => 'Eko Prasetyo', 'username' => 'eko_kosong', 'email' => 'eko@siswa.test', 'kelas' => 'XI MIPA 3', 'aktif' => true],
         ];
 
         foreach ($siswaData as $item) {
@@ -85,7 +92,8 @@ class DemoSeeder extends Seeder
                     'password' => Hash::make('password123'),
                     'peran' => 'siswa',
                     'kelas' => $item['kelas'],
-                    'aktif' => true,
+                    'aktif' => $item['aktif'],
+                    'wajib_ganti_password' => false,
                 ]
             );
         }

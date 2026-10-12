@@ -20,6 +20,9 @@ class PercobaanKuis extends Model
         'status_kelulusan',
         'esai_menunggu_nilai',
         'dibatalkan',
+        'dibatalkan_oleh',
+        'dibatalkan_pada',
+        'alasan_pembatalan',
         'nilai_otomatis',
         'nilai_akhir',
         'urutan_soal_teracak',
@@ -31,6 +34,7 @@ class PercobaanKuis extends Model
             'nomor_percobaan' => 'integer',
             'waktu_mulai' => 'datetime',
             'waktu_selesai' => 'datetime',
+            'dibatalkan_pada' => 'datetime',
             'esai_menunggu_nilai' => 'boolean',
             'dibatalkan' => 'boolean',
             'nilai_otomatis' => 'decimal:2',
@@ -47,6 +51,11 @@ class PercobaanKuis extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function dibatalkanOleh(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'dibatalkan_oleh');
     }
 
     public function jawabanSiswa(): HasMany

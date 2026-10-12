@@ -15,14 +15,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const tokenCsrf = elMetaCsrf.getAttribute('content');
     const urlDetak = document.body.dataset.urlDetak || '/detak';
     const intervalDetak = parseInt(document.body.dataset.intervalDetak || '45', 10) * 1000;
+    const batasDiam = parseInt(document.body.dataset.batasDiam || '1800', 10) * 1000;
 
     let idTimer = null;
     let sesiBerhenti = false;
+    let waktuInteraksiTerakhir = Date.now();
+    let statusDiam = false;
+
+    // Catat interaksi pengguna dengan pembatasan frekuensi (throttle 1 detik)
+    let throttleInteraksi = 0;
+    function catatInteraksi() {
+        const sekarang = Date.now();
+        if (sekarang - throttleInteraksi < 1000) return;
+        throttleInteraksi = sekarang;
+        waktuInteraksiTerakhir = sekarang;
+
+        // Jika sebelumnya masuk mode diam, aktifkan kembali dan segera kirim sinyal detak
+        if (statusDiam) {
+            statusDiam = false;
+            kirimDetak();
+            mulaiInterval();
+        }
+    }
+
+    ['pointerdown', 'keydown', 'scroll', 'touchstart', 'mousemove'].forEach((evt) => {
+        window.addEventListener(evt, catatInteraksi, { passive: true });
+    });
 
     // Fungsi kirim detak jantung via fetch keepalive
     async function kirimDetak() {
         if (sesiBerhenti) return;
         if (document.visibilityState !== 'visible') return;
+
+        // Jika pengguna sudah diam melebihi batas diam (default 30 menit), hentikan detak
+        if (Date.now() - waktuInteraksiTerakhir > batasDiam) {
+            statusDiam = true;
+            if (idTimer) {
+                clearInterval(idTimer);
+                idTimer = null;
+            }
+            return;
+        }
 
         try {
             const respons = await fetch(urlDetak, {
@@ -64,8 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Pantau perubahan visibilitas tab (visibilitychange)
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
-            kirimDetak();
-            mulaiInterval();
+            if (Date.now() - waktuInteraksiTerakhir <= batasDiam) {
+                kirimDetak();
+                mulaiInterval();
+            }
         } else {
             if (idTimer) {
                 clearInterval(idTimer);
@@ -77,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Saat pagehide (perpindahan halaman atau tutup tab), kirim update via navigator.sendBeacon
     window.addEventListener('pagehide', () => {
         if (sesiBerhenti) return;
+        if (Date.now() - waktuInteraksiTerakhir > batasDiam) return;
 
         const dataForm = new FormData();
         dataForm.append('_token', tokenCsrf);

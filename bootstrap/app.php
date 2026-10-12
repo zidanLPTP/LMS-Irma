@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CatatAktivitas;
 use App\Http\Middleware\PeranMiddleware;
+use App\Http\Middleware\PeriksaAkunAktifDanPassword;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'peran' => PeranMiddleware::class,
             'catat.aktivitas' => CatatAktivitas::class,
+            'periksa.status' => PeriksaAkunAktifDanPassword::class,
         ]);
         $middleware->redirectGuestsTo(fn () => route('masuk'));
     })

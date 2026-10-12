@@ -17,7 +17,8 @@
 </head>
 <body class="h-full font-sans text-ink antialiased bg-bg flex flex-col"
     data-url-detak="{{ route('siswa.detak') }}"
-    data-interval-detak="{{ config('lms.interval_detak_detik', 45) }}">
+    data-interval-detak="{{ config('lms.interval_detak_detik', 45) }}"
+    data-batas-diam="{{ config('lms.batas_diam_detik', 1800) }}">
     <!-- Bilah Atas Siswa Sesuai Spesifikasi -->
     <header class="bg-white border-b border-border sticky top-0 z-30">
         <div class="max-w-[1000px] mx-auto px-4 h-16 flex items-center justify-between">

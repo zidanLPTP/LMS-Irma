@@ -70,12 +70,30 @@
                     </span>
                 @endif
             </a>
+            <div class="pt-2 border-t border-border mt-2">
+                <span class="block px-3 py-1 text-xs font-extrabold text-muted uppercase tracking-wider">Pengguna</span>
+                <a href="{{ route('admin.pengguna.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.pengguna.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="users" ukuran="18" />
+                    <span>Kelola Pengguna</span>
+                </a>
+            </div>
+            <div class="pt-2 border-t border-border mt-2">
+                <span class="block px-3 py-1 text-xs font-extrabold text-muted uppercase tracking-wider">Laporan</span>
+                <a href="{{ route('admin.laporan.akses') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.laporan.akses*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="clock" ukuran="18" />
+                    <span>Laporan Akses</span>
+                </a>
+                <a href="{{ route('admin.laporan.nilai') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.laporan.nilai*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="chart-bar" ukuran="18" />
+                    <span>Laporan Nilai</span>
+                </a>
+            </div>
         </div>
     </header>
 
     <div class="flex-1 max-w-[1200px] w-full mx-auto px-4 py-6 flex gap-6">
         <!-- Sidebar Desktop -->
-        <aside class="hidden lg:block w-64 shrink-0 space-y-1">
+        <aside class="hidden lg:block w-64 shrink-0 space-y-4">
             <div class="bg-white rounded-2xl border border-border p-3 space-y-1 shadow-[0_1px_3px_rgba(31,45,42,0.08)]">
                 <span class="block px-3 py-1.5 text-xs font-extrabold text-muted uppercase tracking-wider">Menu Konten</span>
                 <a href="{{ route('admin.beranda') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.beranda') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
@@ -100,6 +118,26 @@
                             {{ $jumlahAntreanEsai }}
                         </span>
                     @endif
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-3 space-y-1 shadow-[0_1px_3px_rgba(31,45,42,0.08)]">
+                <span class="block px-3 py-1.5 text-xs font-extrabold text-muted uppercase tracking-wider">Pengguna</span>
+                <a href="{{ route('admin.pengguna.index') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.pengguna.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="users" ukuran="20" />
+                    <span>Kelola Pengguna</span>
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-3 space-y-1 shadow-[0_1px_3px_rgba(31,45,42,0.08)]">
+                <span class="block px-3 py-1.5 text-xs font-extrabold text-muted uppercase tracking-wider">Laporan Penelitian</span>
+                <a href="{{ route('admin.laporan.akses') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.laporan.akses*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="clock" ukuran="20" />
+                    <span>Laporan Akses</span>
+                </a>
+                <a href="{{ route('admin.laporan.nilai') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.laporan.nilai*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="chart-bar" ukuran="20" />
+                    <span>Laporan Nilai</span>
                 </a>
             </div>
         </aside>
