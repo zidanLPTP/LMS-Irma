@@ -31,6 +31,32 @@
                         <span>{{ $langkahSelesai }} dari {{ $totalLangkah }} langkah selesai</span>
                     </div>
 
+                    @php
+                        // Ambil riwayat nilai kuis yang telah selesai untuk ringkasan pribadi (tanpa perbandingan dengan siswa lain)
+                        $percobaanTerakhirSiswa = \App\Models\PercobaanKuis::with('kuis')
+                            ->where('user_id', auth()->id())
+                            ->where('status_pengerjaan', 'selesai')
+                            ->where('dibatalkan', false)
+                            ->latest('waktu_selesai')
+                            ->first();
+                        $jumlahKuisTuntas = \App\Models\PercobaanKuis::where('user_id', auth()->id())
+                            ->where('status_pengerjaan', 'selesai')
+                            ->where('dibatalkan', false)
+                            ->distinct('kuis_id')
+                            ->count('kuis_id');
+                    @endphp
+
+                    @if ($jumlahKuisTuntas > 0 || $percobaanTerakhirSiswa)
+                        <div class="pt-2 border-t border-border flex items-center justify-between text-xs">
+                            <span class="text-muted font-bold">Kuis Selesai: <strong class="text-ink">{{ $jumlahKuisTuntas }}</strong></span>
+                            @if ($percobaanTerakhirSiswa && $percobaanTerakhirSiswa->nilai_akhir !== null)
+                                <a href="{{ route('siswa.nilai.index') }}" class="text-green-700 font-extrabold hover:underline">
+                                    Nilai Terbaru: {{ $percobaanTerakhirSiswa->nilai_akhir }}
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+
                     @if ($langkahLanjutan)
                         <div class="pt-2">
                             @if ($langkahLanjutan['tipe'] === 'bab')
@@ -53,6 +79,69 @@
                 </div>
             </div>
         </x-kartu>
+
+        <!-- Blok Pengumuman Terbaru (Maksimal 3, disematkan di atas, dengan penanda Baru) -->
+        @if (isset($pengumumanTerbaru) && $pengumumanTerbaru->isNotEmpty())
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-extrabold text-ink flex items-center gap-2">
+                        <x-ikon nama="megaphone" ukuran="20" kelas="text-green-700" />
+                        <span>Pengumuman</span>
+                    </h2>
+                    <a href="{{ route('siswa.pengumuman.index') }}" class="text-xs font-bold text-green-700 hover:underline flex items-center gap-1">
+                        <span>{{ __('pengumuman.tautan_lihat_semua') }}</span>
+                        <x-ikon nama="arrow-right" ukuran="14" />
+                    </a>
+                </div>
+
+                <div class="space-y-3">
+                    @foreach ($pengumumanTerbaru as $pengumuman)
+                        @php
+                            $sudahDibaca = in_array($pengumuman->id, $pengumumanDibacaIds ?? []);
+                        @endphp
+                        <x-kartu class="p-4 sm:p-5 border border-border hover:border-green-300 transition-colors">
+                            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                                <div class="space-y-1 flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        @if ($pengumuman->disematkan)
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800">
+                                                <x-ikon nama="pin" ukuran="12" />
+                                                {{ __('pengumuman.lencana_disematkan') }}
+                                            </span>
+                                        @endif
+
+                                        @if (! $sudahDibaca)
+                                            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-700">
+                                                {{ __('pengumuman.lencana_baru') }}
+                                            </span>
+                                        @endif
+
+                                        <span class="text-xs text-muted">
+                                            {{ $pengumuman->created_at->translatedFormat('d M Y') }}
+                                        </span>
+                                    </div>
+
+                                    <h3 class="text-base font-extrabold text-ink">
+                                        <a href="{{ route('siswa.pengumuman.show', $pengumuman) }}" class="hover:text-green-700">
+                                            {{ $pengumuman->judul }}
+                                        </a>
+                                    </h3>
+                                    <p class="text-xs text-muted whitespace-pre-line line-clamp-2">
+                                        {{ $pengumuman->isi }}
+                                    </p>
+                                </div>
+
+                                <div class="shrink-0 self-start sm:self-center">
+                                    <x-tombol tipe="garis" href="{{ route('siswa.pengumuman.show', $pengumuman) }}" class="!min-h-[36px] !px-3 text-xs">
+                                        Baca
+                                    </x-tombol>
+                                </div>
+                            </div>
+                        </x-kartu>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
         <!-- Stepper Alur Belajar (Mobile: Vertikal, Laptop: Grid / Horizontal Stepper) -->
         <div class="space-y-4">

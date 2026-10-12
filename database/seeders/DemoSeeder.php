@@ -6,6 +6,8 @@ use App\Models\Bab;
 use App\Models\JawabanSiswa;
 use App\Models\Kuis;
 use App\Models\Materi;
+use App\Models\Notifikasi;
+use App\Models\Pengumuman;
 use App\Models\PercobaanKuis;
 use App\Models\PilihanJawaban;
 use App\Models\Soal;
@@ -384,6 +386,184 @@ class DemoSeeder extends Seeder
                     'dinilai_pada' => null,
                     'waktu_mulai_soal' => now()->subHour()->addMinutes(1),
                     'waktu_jawab' => now()->subHour()->addMinutes(7),
+                ]
+            );
+        }
+
+        // Variasi percobaan tambahan untuk Ahmad Fauzi (menampilkan status beragam di Nilai Saya):
+        // 1. Percobaan Pretest: Selesai dengan nilai 70
+        if ($siswaAhmad && isset($pretest)) {
+            PercobaanKuis::updateOrCreate(
+                [
+                    'kuis_id' => $pretest->id,
+                    'user_id' => $siswaAhmad->id,
+                    'nomor_percobaan' => 1,
+                ],
+                [
+                    'status_pengerjaan' => 'selesai',
+                    'status_kelulusan' => null, // Pretest tidak memiliki status kelulusan
+                    'esai_menunggu_nilai' => false,
+                    'nilai_otomatis' => 70.00,
+                    'nilai_akhir' => 70.00,
+                    'dibatalkan' => false,
+                    'urutan_soal_teracak' => [],
+                    'waktu_mulai' => now()->subDays(2),
+                    'waktu_selesai' => now()->subDays(2)->addMinutes(15),
+                ]
+            );
+        }
+
+        // 2. Kuis Bab 2:
+        // - Percobaan 1: Belum lulus (nilai 50)
+        // - Percobaan 2: Lulus dengan esai yang sudah dinilai dan memiliki catatan guru (nilai 85)
+        // - Percobaan 3: Dibatalkan oleh admin (tidak boleh tampil di halaman siswa)
+        if ($siswaAhmad && isset($kuisBab2)) {
+            // Percobaan 1 Bab 2 (Belum lulus)
+            PercobaanKuis::updateOrCreate(
+                [
+                    'kuis_id' => $kuisBab2->id,
+                    'user_id' => $siswaAhmad->id,
+                    'nomor_percobaan' => 1,
+                ],
+                [
+                    'status_pengerjaan' => 'selesai',
+                    'status_kelulusan' => 'belum_lulus',
+                    'esai_menunggu_nilai' => false,
+                    'nilai_otomatis' => 50.00,
+                    'nilai_akhir' => 50.00,
+                    'dibatalkan' => false,
+                    'urutan_soal_teracak' => [],
+                    'waktu_mulai' => now()->subDay(),
+                    'waktu_selesai' => now()->subDay()->addMinutes(10),
+                ]
+            );
+
+            // Percobaan 2 Bab 2 (Lulus, esai dinilai ber-catatan guru)
+            $percobaan2Bab2 = PercobaanKuis::updateOrCreate(
+                [
+                    'kuis_id' => $kuisBab2->id,
+                    'user_id' => $siswaAhmad->id,
+                    'nomor_percobaan' => 2,
+                ],
+                [
+                    'status_pengerjaan' => 'selesai',
+                    'status_kelulusan' => 'lulus',
+                    'esai_menunggu_nilai' => false,
+                    'nilai_otomatis' => 70.00,
+                    'nilai_akhir' => 85.00,
+                    'dibatalkan' => false,
+                    'urutan_soal_teracak' => [],
+                    'waktu_mulai' => now()->subHours(5),
+                    'waktu_selesai' => now()->subHours(5)->addMinutes(12),
+                ]
+            );
+
+            // Berikan satu catatan guru pada jawaban percobaan ini
+            $soalEsaiBab2 = Soal::where('kuis_id', $kuisBab2->id)->where('tipe_soal', 'esai')->first();
+            if ($soalEsaiBab2) {
+                JawabanSiswa::updateOrCreate(
+                    ['percobaan_kuis_id' => $percobaan2Bab2->id, 'soal_id' => $soalEsaiBab2->id],
+                    [
+                        'jawaban_teks' => 'Sistem peredaran darah ganda terdiri dari peredaran darah kecil (paru-paru) dan peredaran darah besar (seluruh tubuh).',
+                        'poin_diperoleh' => 15.00,
+                        'catatan_guru' => 'Penjelasan sudah sangat runtut dan tepat. Pertahankan pemahaman konsep ini!',
+                        'dinilai_pada' => now()->subHours(3),
+                        'waktu_mulai_soal' => now()->subHours(5)->addMinutes(5),
+                        'waktu_jawab' => now()->subHours(5)->addMinutes(11),
+                    ]
+                );
+            }
+
+            // Percobaan 3 Bab 2 (Dibatalkan oleh admin karena gangguan teknis)
+            PercobaanKuis::updateOrCreate(
+                [
+                    'kuis_id' => $kuisBab2->id,
+                    'user_id' => $siswaAhmad->id,
+                    'nomor_percobaan' => 3,
+                ],
+                [
+                    'status_pengerjaan' => 'selesai',
+                    'status_kelulusan' => 'belum_lulus',
+                    'esai_menunggu_nilai' => false,
+                    'nilai_otomatis' => 20.00,
+                    'nilai_akhir' => 20.00,
+                    'dibatalkan' => true,
+                    'urutan_soal_teracak' => [],
+                    'waktu_mulai' => now()->subHours(2),
+                    'waktu_selesai' => now()->subHours(2)->addMinutes(4),
+                ]
+            );
+        }
+
+        // 3. Buat Pengumuman Contoh untuk Demo
+        $adminUser = User::where('peran', 'admin')->first();
+        if ($adminUser) {
+            // Pengumuman 1: Disematkan & Terbit
+            Pengumuman::updateOrCreate(
+                ['judul' => 'Jadwal Pelaksanaan Penelitian Biologi'],
+                [
+                    'admin_id' => $adminUser->id,
+                    'isi' => "Halo semua siswa!\nPelaksanaan pembelajaran mandiri biologi sel berlangsung mulai minggu ini. Pastikan Anda menyelesaikan Pretest terlebih dahulu sebelum mempelajari modul Bab 1.\nSelamat belajar dan semoga sukses!",
+                    'status' => 'terbit',
+                    'disematkan' => true,
+                    'tanggal_kedaluwarsa' => null,
+                ]
+            );
+
+            // Pengumuman 2: Draf (hanya tampil di admin)
+            Pengumuman::updateOrCreate(
+                ['judul' => 'Draf Petunjuk Pengisian Posttest'],
+                [
+                    'admin_id' => $adminUser->id,
+                    'isi' => "Petunjuk teknis pengerjaan evaluasi akhir Posttest untuk seluruh peserta penelitian.\n(Masih dalam peninjauan).",
+                    'status' => 'draf',
+                    'disematkan' => false,
+                    'tanggal_kedaluwarsa' => null,
+                ]
+            );
+
+            // Pengumuman 3: Kedaluwarsa (tidak tampil di siswa)
+            Pengumuman::updateOrCreate(
+                ['judul' => 'Uji Coba Sistem Penelitian (Kedaluwarsa)'],
+                [
+                    'admin_id' => $adminUser->id,
+                    'isi' => 'Uji coba server lokal telah selesai dilakukan pada hari kemarin.',
+                    'status' => 'terbit',
+                    'disematkan' => false,
+                    'tanggal_kedaluwarsa' => now()->subDays(2)->toDateString(),
+                ]
+            );
+        }
+
+        // 4. Buat Notifikasi Contoh untuk Siswa Demo (Ahmad Fauzi)
+        if ($siswaAhmad) {
+            // Notifikasi 1: Langkah baru terbuka
+            Notifikasi::updateOrCreate(
+                [
+                    'user_id' => $siswaAhmad->id,
+                    'jenis' => 'langkah_terbuka',
+                    'referensi' => 'bab_1',
+                ],
+                [
+                    'judul' => 'Tahapan Belajar Terbuka',
+                    'isi' => 'Selamat! Tahapan pembelajaran Bab 1: Struktur dan Fungsi Sel kini telah terbuka untuk Anda pelajari.',
+                    'tautan' => route('siswa.beranda'),
+                    'dibaca_pada' => null,
+                ]
+            );
+
+            // Notifikasi 2: Esai sudah dinilai
+            Notifikasi::updateOrCreate(
+                [
+                    'user_id' => $siswaAhmad->id,
+                    'jenis' => 'esai_dinilai',
+                    'referensi' => 'percobaan_2',
+                ],
+                [
+                    'judul' => 'Nilai Esai Tersedia',
+                    'isi' => 'Jawaban esai Anda untuk Kuis Bab 2 telah selesai dinilai oleh guru. Silakan periksa hasil akhir evaluasi Anda.',
+                    'tautan' => route('siswa.nilai.index'),
+                    'dibaca_pada' => now()->subHour(),
                 ]
             );
         }

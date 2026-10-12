@@ -14,6 +14,7 @@ class ProgresMateri extends Model
         'materi_id',
         'sudah_dibuka',
         'waktu_buka',
+        'selesai_pada',
     ];
 
     protected function casts(): array
@@ -21,6 +22,7 @@ class ProgresMateri extends Model
         return [
             'sudah_dibuka' => 'boolean',
             'waktu_buka' => 'datetime',
+            'selesai_pada' => 'datetime',
         ];
     }
 

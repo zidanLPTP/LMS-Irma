@@ -1,11 +1,19 @@
 <x-layouts.induk judul="Masuk ke LMS">
     <div class="max-w-md mx-auto">
         <x-kartu class="p-6 sm:p-8">
+            @php
+                $namaSitusApp = \App\Models\Pengaturan::ambil('nama_situs', config('app.name', 'LMS Penelitian'));
+                $logoSitusApp = \App\Models\Pengaturan::ambil('logo_situs');
+            @endphp
             <div class="text-center mb-6">
                 <div class="inline-flex p-3 bg-green-100 rounded-2xl text-green-700 mb-3">
-                    <x-ikon nama="leaf" ukuran="32" kelas="text-green-700" />
+                    @if ($logoSitusApp && file_exists(public_path($logoSitusApp)))
+                        <img src="{{ asset($logoSitusApp) }}" alt="Logo" class="h-10 w-auto max-w-[120px] object-contain">
+                    @else
+                        <x-ikon nama="leaf" ukuran="32" kelas="text-green-700" />
+                    @endif
                 </div>
-                <h1 class="text-2xl font-extrabold text-ink">Masuk ke LMS</h1>
+                <h1 class="text-2xl font-extrabold text-ink">{{ $namaSitusApp }}</h1>
                 <p class="text-sm text-muted mt-1">Gunakan nama pengguna atau alamat surel terdaftar</p>
             </div>
 

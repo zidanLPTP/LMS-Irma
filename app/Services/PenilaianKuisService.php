@@ -372,6 +372,28 @@ class PenilaianKuisService
                 'nilai_akhir' => $nilaiAkhir,
             ]);
 
+            // Picu notifikasi langkah belajar berikutnya jika terbuka (Peristiwa B)
+            try {
+                $user = $percobaan->user;
+                $bukaAksesService = app(BukaAksesService::class);
+                $daftarLangkah = $bukaAksesService->daftarLangkahBelajar($user);
+
+                foreach ($daftarLangkah as $langkah) {
+                    if ($langkah['status'] === 'terbuka') {
+                        $model = $langkah['model'];
+                        $tipe = $langkah['tipe'];
+                        app(NotifikasiService::class)->notifikasiLangkahTerbuka(
+                            $user,
+                            $tipe,
+                            $model->id,
+                            $langkah['judul']
+                        );
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Notifikasi tidak boleh menggagalkan penyerahan kuis
+            }
+
             return $percobaan->fresh();
         });
     }
@@ -440,6 +462,13 @@ class PenilaianKuisService
                     'esai_menunggu_nilai' => false,
                     'nilai_akhir' => $nilaiAkhir,
                 ]);
+
+                // Picu notifikasi siswa (Peristiwa A)
+                try {
+                    app(NotifikasiService::class)->notifikasiEsaiDinilai($percobaan->user, $percobaan->id, $kuis->judul);
+                } catch (\Throwable $e) {
+                    // Jangan gagalkan transaksi penilaian jika notifikasi gagal
+                }
             }
 
             return $jawaban;

@@ -22,4 +22,15 @@ class Pengaturan extends Model
 
         return $baris ? $baris->nilai : $bawaan;
     }
+
+    /**
+     * Tetapkan atau perbarui nilai pengaturan berdasarkan kunci.
+     */
+    public static function setel(string $kunci, mixed $nilai): static
+    {
+        return static::updateOrCreate(
+            ['kunci' => $kunci],
+            ['nilai' => (string) $nilai]
+        );
+    }
 }

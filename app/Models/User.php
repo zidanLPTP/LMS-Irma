@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -85,6 +86,24 @@ class User extends Authenticatable
     public function riwayatTindakan(): HasMany
     {
         return $this->hasMany(RiwayatTindakanAdmin::class, 'siswa_id');
+    }
+
+    /**
+     * Relasi ke pengumuman yang sudah dibaca oleh siswa ini.
+     */
+    public function pengumumanDibaca(): BelongsToMany
+    {
+        return $this->belongsToMany(Pengumuman::class, 'pengumuman_dibaca', 'user_id', 'pengumuman_id')
+            ->withPivot('dibaca_pada')
+            ->withTimestamps();
+    }
+
+    /**
+     * Relasi ke notifikasi siswa ini.
+     */
+    public function notifikasi(): HasMany
+    {
+        return $this->hasMany(Notifikasi::class, 'user_id');
     }
 
     /**

@@ -8,10 +8,20 @@
                 <h1 class="text-2xl font-extrabold text-ink">Butir Soal: {{ $kuis->judul }}</h1>
                 <p class="text-sm text-muted mt-1">Kelola bank butir soal pilihan ganda, isian singkat, dan esai.</p>
             </div>
-            <x-tombol tipe="utama" href="{{ route('admin.kuis.soal.create', $kuis) }}" class="w-full sm:w-auto">
-                <x-ikon nama="plus" ukuran="18" />
-                <span>Tambah Butir Soal</span>
-            </x-tombol>
+            <div class="flex items-center gap-2">
+                <x-tombol tipe="garis" href="{{ route('admin.pratinjau.kuis', $kuis) }}" class="text-xs font-bold text-amber-800 border-amber-300 hover:bg-amber-50">
+                    <x-ikon nama="eye" ukuran="16" />
+                    <span>Pratinjau Kuis</span>
+                </x-tombol>
+                <x-tombol tipe="garis" href="{{ route('admin.impor-soal.create', $kuis) }}" class="text-xs font-bold bg-white text-ink border-border hover:bg-surface">
+                    <x-ikon nama="upload" ukuran="16" />
+                    <span>Impor Excel</span>
+                </x-tombol>
+                <x-tombol tipe="utama" href="{{ route('admin.kuis.soal.create', $kuis) }}" class="w-full sm:w-auto text-xs font-bold">
+                    <x-ikon nama="plus" ukuran="16" />
+                    <span>Tambah Butir Soal</span>
+                </x-tombol>
+            </div>
         </div>
 
         <x-pita-info tipe="info">

@@ -19,13 +19,21 @@
     <!-- Header Mobile & Desktop -->
     <header class="bg-white border-b border-border sticky top-0 z-30">
         <div class="max-w-[1200px] mx-auto px-4 h-16 flex items-center justify-between">
+            @php
+                $namaSitusApp = \App\Models\Pengaturan::ambil('nama_situs', config('app.name', 'LMS Penelitian Sekolah'));
+                $logoSitusApp = \App\Models\Pengaturan::ambil('logo_situs');
+            @endphp
             <div class="flex items-center gap-3">
                 <button type="button" @click="bukaMenuHp = !bukaMenuHp" class="lg:hidden p-2 rounded-xl text-ink hover:bg-green-50 focus:outline-none" aria-label="Buka Menu Navigasi">
                     <x-ikon nama="menu" ukuran="24" />
                 </button>
                 <a href="{{ route('admin.beranda') }}" class="flex items-center gap-2 text-green-700 font-extrabold text-lg">
-                    <x-ikon nama="leaf" ukuran="24" kelas="text-green-700" />
-                    <span>LMS Admin (Irma)</span>
+                    @if ($logoSitusApp && file_exists(public_path($logoSitusApp)))
+                        <img src="{{ asset($logoSitusApp) }}" alt="Logo" class="h-8 w-auto max-w-[120px] object-contain">
+                    @else
+                        <x-ikon nama="leaf" ukuran="24" kelas="text-green-700" />
+                    @endif
+                    <span>{{ $namaSitusApp }}</span>
                 </a>
             </div>
 
@@ -55,6 +63,17 @@
             <a href="{{ route('admin.kuis.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.kuis.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
                 <x-ikon nama="clipboard-list" ukuran="18" />
                 <span>Kuis dan Soal</span>
+            <a href="{{ route('admin.pengguna.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.pengguna.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                <x-ikon nama="users" ukuran="18" />
+                <span>Kelola Pengguna</span>
+            </a>
+            <a href="{{ route('admin.pengumuman.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.pengumuman.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                <x-ikon nama="megaphone" ukuran="18" />
+                <span>Pengumuman</span>
+            </a>
+            <a href="{{ route('admin.pengaturan.edit') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.pengaturan.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                <x-ikon nama="settings" ukuran="18" />
+                <span>Pengaturan LMS</span>
             </a>
             @php
                 $jumlahAntreanEsai = \App\Models\PercobaanKuis::where('status_pengerjaan', 'selesai')->where('dibatalkan', false)->where('esai_menunggu_nilai', true)->count();
@@ -122,10 +141,14 @@
             </div>
 
             <div class="bg-white rounded-2xl border border-border p-3 space-y-1 shadow-[0_1px_3px_rgba(31,45,42,0.08)]">
-                <span class="block px-3 py-1.5 text-xs font-extrabold text-muted uppercase tracking-wider">Pengguna</span>
+                <span class="block px-3 py-1.5 text-xs font-extrabold text-muted uppercase tracking-wider">Pengguna & Komunikasi</span>
                 <a href="{{ route('admin.pengguna.index') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.pengguna.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
                     <x-ikon nama="users" ukuran="20" />
                     <span>Kelola Pengguna</span>
+                </a>
+                <a href="{{ route('admin.pengumuman.index') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.pengumuman.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="megaphone" ukuran="20" />
+                    <span>Pengumuman</span>
                 </a>
             </div>
 
@@ -138,6 +161,14 @@
                 <a href="{{ route('admin.laporan.nilai') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.laporan.nilai*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
                     <x-ikon nama="chart-bar" ukuran="20" />
                     <span>Laporan Nilai</span>
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-3 space-y-1 shadow-[0_1px_3px_rgba(31,45,42,0.08)]">
+                <span class="block px-3 py-1.5 text-xs font-extrabold text-muted uppercase tracking-wider">Sistem</span>
+                <a href="{{ route('admin.pengaturan.edit') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.pengaturan.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="settings" ukuran="20" />
+                    <span>Pengaturan LMS</span>
                 </a>
             </div>
         </aside>

@@ -2,19 +2,28 @@
 
 use App\Http\Controllers\Admin\BabController;
 use App\Http\Controllers\Admin\BerandaController as AdminBerandaController;
+use App\Http\Controllers\Admin\ImporSiswaController;
+use App\Http\Controllers\Admin\ImporSoalController;
 use App\Http\Controllers\Admin\KuisController;
 use App\Http\Controllers\Admin\LaporanAksesController;
 use App\Http\Controllers\Admin\LaporanNilaiController;
 use App\Http\Controllers\Admin\MateriController;
+use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\Admin\PenilaianEsaiController;
+use App\Http\Controllers\Admin\PratinjauController;
 use App\Http\Controllers\Admin\SoalController;
 use App\Http\Controllers\Auth\DaftarController;
 use App\Http\Controllers\Auth\MasukController;
 use App\Http\Controllers\PenyajiMateriPdfController;
 use App\Http\Controllers\Siswa\BerandaController as SiswaBerandaController;
 use App\Http\Controllers\Siswa\DetakJantungController;
+use App\Http\Controllers\Siswa\NilaiSayaController;
+use App\Http\Controllers\Siswa\NotifikasiController;
 use App\Http\Controllers\Siswa\PasswordController;
+use App\Http\Controllers\Siswa\PencarianController;
+use App\Http\Controllers\Siswa\PengumumanController;
+use App\Http\Controllers\Siswa\ProfilController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,8 +52,10 @@ Route::post('/keluar', [MasukController::class, 'destroy'])->middleware('auth')-
 // Area Siswa
 Route::middleware(['auth', 'peran:siswa', 'periksa.status', 'catat.aktivitas'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/beranda', [SiswaBerandaController::class, 'index'])->name('beranda');
+    Route::get('/cari', PencarianController::class)->middleware('throttle:30,1')->name('cari');
     Route::get('/bab/{bab}', [App\Http\Controllers\Siswa\BabController::class, 'show'])->name('bab.show');
     Route::get('/bab/{bab}/materi/{materi}', [App\Http\Controllers\Siswa\MateriController::class, 'show'])->name('bab.materi.show');
+    Route::post('/bab/{bab}/materi/{materi}/selesai', [App\Http\Controllers\Siswa\MateriController::class, 'toggleSelesai'])->name('bab.materi.toggle-selesai');
 
     // Engine Kuis Siswa
     Route::get('/kuis/{kuis}', [App\Http\Controllers\Siswa\KuisController::class, 'show'])->name('kuis.show');
@@ -57,6 +68,22 @@ Route::middleware(['auth', 'peran:siswa', 'periksa.status', 'catat.aktivitas'])-
     // Ganti Password Siswa
     Route::get('/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
+
+    // Profil Siswa
+    Route::get('/profil', [ProfilController::class, 'edit'])->name('profil.edit');
+    Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
+
+    // Rekapitulasi Nilai Siswa
+    Route::get('/nilai', [NilaiSayaController::class, 'index'])->name('nilai.index');
+
+    // Pengumuman Siswa
+    Route::get('/pengumuman', [PengumumanController::class, 'index'])->name('pengumuman.index');
+    Route::get('/pengumuman/{pengumuman}', [PengumumanController::class, 'show'])->name('pengumuman.show');
+
+    // Notifikasi Siswa
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+    Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'tandaiSemuaDibaca'])->name('notifikasi.baca-semua');
+    Route::get('/notifikasi/{notifikasi}', [NotifikasiController::class, 'buka'])->name('notifikasi.buka');
 });
 
 // Endpoint Detak Jantung (Heartbeat) - Auth (siswa dicatat, admin 204), Throttle 10 req/menit
@@ -68,6 +95,13 @@ Route::middleware('auth')->get('/materi-pdf/{materi}', PenyajiMateriPdfControlle
 // Area Admin
 Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/beranda', [AdminBerandaController::class, 'index'])->name('beranda');
+
+    // Pengaturan Sistem
+    Route::get('pengaturan', [PengaturanController::class, 'edit'])->name('pengaturan.edit');
+    Route::put('pengaturan', [PengaturanController::class, 'update'])->name('pengaturan.update');
+
+    // Pengumuman Admin
+    Route::resource('pengumuman', App\Http\Controllers\Admin\PengumumanController::class)->except(['show']);
 
     // Kelola Bab
     Route::resource('bab', BabController::class)->except(['show']);
@@ -105,4 +139,24 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
     Route::patch('pengguna/{pengguna}/toggle-aktif', [PenggunaController::class, 'toggleAktif'])->name('pengguna.toggle-aktif');
     Route::post('pengguna/{pengguna}/reset-password', [PenggunaController::class, 'resetPassword'])->name('pengguna.reset-password');
     Route::post('pengguna/{pengguna}/reset-kesempatan', [PenggunaController::class, 'resetKesempatan'])->name('pengguna.reset-kesempatan');
+
+    // Impor Siswa dari Excel
+    Route::get('impor-siswa/templat', [ImporSiswaController::class, 'unduhTemplat'])->name('impor-siswa.templat');
+    Route::get('impor-siswa', [ImporSiswaController::class, 'create'])->name('impor-siswa.create');
+    Route::post('impor-siswa/pratinjau', [ImporSiswaController::class, 'pratinjau'])->name('impor-siswa.pratinjau');
+    Route::post('impor-siswa/konfirmasi', [ImporSiswaController::class, 'konfirmasi'])->name('impor-siswa.konfirmasi');
+    Route::get('impor-siswa/unduh-akun', [ImporSiswaController::class, 'unduhAkun'])->name('impor-siswa.unduh-akun');
+
+    // Impor Soal Kuis dari Excel
+    Route::get('impor-soal/templat', [ImporSoalController::class, 'unduhTemplat'])->name('impor-soal.templat');
+    Route::get('kuis/{kuis}/impor-soal', [ImporSoalController::class, 'create'])->name('impor-soal.create');
+    Route::post('kuis/{kuis}/impor-soal/pratinjau', [ImporSoalController::class, 'pratinjau'])->name('impor-soal.pratinjau');
+    Route::post('kuis/{kuis}/impor-soal/konfirmasi', [ImporSoalController::class, 'konfirmasi'])->name('impor-soal.konfirmasi');
+
+    // Mode Pratinjau Sebagai Siswa oleh Admin
+    Route::prefix('pratinjau')->name('pratinjau.')->group(function () {
+        Route::get('bab/{bab}', [PratinjauController::class, 'bab'])->name('bab');
+        Route::get('bab/{bab}/materi/{materi}', [PratinjauController::class, 'materi'])->name('materi');
+        Route::get('kuis/{kuis}', [PratinjauController::class, 'kuis'])->name('kuis');
+    });
 });

@@ -12,13 +12,34 @@
             </span>
         </div>
 
-        <div>
-            <span class="text-xs font-extrabold text-green-700 uppercase tracking-wider">
-                {{ $bab->judul }} &bull; Materi {{ $materi->urutan }}
-            </span>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight mt-1">
-                {{ $materi->judul }}
-            </h1>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <span class="text-xs font-extrabold text-green-700 uppercase tracking-wider">
+                    {{ $bab->judul }} &bull; Materi {{ $materi->urutan }}
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight mt-1">
+                    {{ $materi->judul }}
+                </h1>
+            </div>
+
+            <!-- Tombol Tandai Selesai (Penanda Belajar Pribadi Siswa) -->
+            <div>
+                <form method="POST" action="{{ route('siswa.bab.materi.toggle-selesai', [$bab, $materi]) }}">
+                    @csrf
+                    @if ($selesai ?? false)
+                        <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-green-100 text-green-800 border border-green-200 hover:bg-green-200 transition-colors">
+                            <x-ikon nama="check-circle" ukuran="16" kelas="text-green-700" />
+                            <span>Selesai Dipelajari</span>
+                            <span class="text-[10px] text-green-700 font-normal">(Klik untuk batalkan)</span>
+                        </button>
+                    @else
+                        <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white text-ink border border-border hover:bg-surface hover:border-green-700 transition-colors">
+                            <x-ikon nama="circle" ukuran="16" class="text-muted" />
+                            <span>Tandai Selesai</span>
+                        </button>
+                    @endif
+                </form>
+            </div>
         </div>
 
         <!-- Penampil Konten Materi -->

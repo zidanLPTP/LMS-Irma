@@ -11,6 +11,7 @@ use App\Models\PercobaanKuis;
 use App\Models\RiwayatTindakanAdmin;
 use App\Models\User;
 use App\Services\BukaAksesService;
+use App\Services\NotifikasiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -284,12 +285,22 @@ class PenggunaController extends Controller
 
         $kuis = Kuis::find($kuisId);
 
-        RiwayatTindakanAdmin::create([
+        $tindakanAdmin = RiwayatTindakanAdmin::create([
             'admin_id' => $request->user()->id,
             'siswa_id' => $pengguna->id,
             'jenis' => 'reset_kesempatan',
             'keterangan' => "Mereset kesempatan kuis '{$kuis?->judul}'. {$jumlahDibatalkan} percobaan ditandai dibatalkan. Alasan: {$alasan}",
         ]);
+
+        // Picu notifikasi siswa (Peristiwa C)
+        if ($kuis) {
+            app(NotifikasiService::class)->notifikasiKesempatanDireset(
+                $pengguna,
+                $kuis->id,
+                $kuis->judul,
+                $tindakanAdmin->id
+            );
+        }
 
         return redirect()->route('admin.pengguna.show', $pengguna)
             ->with('sukses', __('pengguna.pesan.berhasil_reset_kesempatan'));

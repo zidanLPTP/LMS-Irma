@@ -58,12 +58,56 @@ class MateriController extends Controller
         // 5. URL PDF privat
         $urlPdfPrivat = ($materi->tipe === 'pdf') ? route('materi.pdf.sajikan', $materi) : null;
 
+        // 6. Cek apakah materi telah ditandai selesai oleh siswa
+        $progres = ProgresMateri::where('user_id', $user->id)
+            ->where('materi_id', $materi->id)
+            ->first();
+        $selesai = $progres?->selesai_pada !== null;
+
         return view('siswa.materi.show', compact(
             'bab',
             'materi',
             'materiSebelumnya',
             'materiBerikutnya',
-            'urlPdfPrivat'
+            'urlPdfPrivat',
+            'selesai'
         ));
+    }
+
+    /**
+     * Tandai materi selesai atau batalkan tanda selesai (penanda belajar pribadi siswa).
+     */
+    public function toggleSelesai(Bab $bab, Materi $materi): RedirectResponse
+    {
+        $user = auth()->user();
+
+        if ((int) $materi->bab_id !== (int) $bab->id) {
+            abort(404);
+        }
+
+        if (! $this->bukaAksesService->apakahBabTerbuka($bab, $user)) {
+            abort(403);
+        }
+
+        $progres = ProgresMateri::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'materi_id' => $materi->id,
+            ],
+            [
+                'sudah_dibuka' => true,
+                'waktu_buka' => now(),
+            ]
+        );
+
+        if ($progres->selesai_pada !== null) {
+            $progres->update(['selesai_pada' => null]);
+            $pesan = 'Tanda selesai pada materi ini telah dibatalkan.';
+        } else {
+            $progres->update(['selesai_pada' => now()]);
+            $pesan = 'Materi berhasil ditandai selesai dipelajari!';
+        }
+
+        return back()->with('sukses', $pesan);
     }
 }

@@ -150,32 +150,53 @@ class AdminPenggunaTest extends TestCase
     }
 
     /**
-     * 3. Tambah siswa manual dan ubah data dengan validasi unik, peran dan aktif diabaikan dari input form.
+     * 3a. Tambah siswa manual: password awal dibuat kata sandi sementara acak 10 karakter, tampil SATU KALI di session, wajib_ganti_password = true, password tersimpan sebagai hash, tidak bocor di log.
      */
-    public function test_tambah_dan_ubah_siswa_dengan_validasi_unik_dan_abaikan_peran_aktif(): void
+    public function test_tambah_siswa_manual_menghasilkan_sandi_sementara_acak_dan_wajib_ganti_password(): void
     {
-        // 1. Tambah siswa
         $resStore = $this->actingAs($this->admin)->post(route('admin.pengguna.store'), [
             'nama_lengkap' => 'Citra Lestari',
             'username' => 'citra_lestari',
             'email' => 'citra@siswa.test',
             'kelas' => 'XI MIPA 3',
-            'peran' => 'admin', // Coba manipulasi
-            'aktif' => false,   // Coba manipulasi
+            'peran' => 'admin', // Coba manipulasi peran
+            'aktif' => false,   // Coba manipulasi status
         ]);
 
         $resStore->assertRedirect(route('admin.pengguna.index'));
+        $resStore->assertSessionHas('sandi_sementara_baru');
+
+        $dataSandi = session('sandi_sementara_baru');
+        $this->assertIsArray($dataSandi);
+        $this->assertEquals('Citra Lestari', $dataSandi['nama']);
+        $this->assertEquals('citra_lestari', $dataSandi['username']);
+        $sandiSementara = $dataSandi['sandi'];
+        $this->assertIsString($sandiSementara);
+        $this->assertSame(10, strlen($sandiSementara));
+
         $siswaBaru = User::where('username', 'citra_lestari')->first();
         $this->assertNotNull($siswaBaru);
         $this->assertSame('siswa', $siswaBaru->peran); // Tetap siswa
         $this->assertTrue($siswaBaru->aktif);          // Tetap aktif
         $this->assertTrue($siswaBaru->wajib_ganti_password); // Siswa baru wajib ganti password
 
-        // Cek jejak audit tambah siswa
+        // Password tersimpan sebagai hash valid dan bukan teks mentah
+        $this->assertNotSame($sandiSementara, $siswaBaru->password);
+        $this->assertTrue(Hash::check($sandiSementara, $siswaBaru->password));
+
+        // Teks kata sandi sementara TIDAK ada di berkas log
+        $logPath = storage_path('logs/laravel.log');
+        if (file_exists($logPath)) {
+            $isiLog = file_get_contents($logPath);
+            $this->assertStringNotContainsString($sandiSementara, $isiLog);
+        }
+
+        // Cek jejak audit tambah siswa (jenis ubah_data) dengan keterangan benar
         $this->assertDatabaseHas('riwayat_tindakan_admin', [
             'admin_id' => $this->admin->id,
             'siswa_id' => $siswaBaru->id,
             'jenis' => 'ubah_data',
+            'keterangan' => 'Menambahkan akun siswa baru secara manual.',
         ]);
 
         // Coba tambah dengan username kembar -> gagal
@@ -186,21 +207,43 @@ class AdminPenggunaTest extends TestCase
             'kelas' => 'XI MIPA 3',
         ]);
         $resGagal->assertSessionHasErrors('username');
+    }
 
-        // 2. Ubah data siswa
-        $resUpdate = $this->actingAs($this->admin)->put(route('admin.pengguna.update', $siswaBaru), [
-            'nama_lengkap' => 'Citra Lestari Dewi',
-            'username' => 'citra_lestari',
-            'email' => 'citra_dewi@siswa.test',
-            'kelas' => 'XI MIPA 4',
-            'peran' => 'admin',
+    /**
+     * 3b. Ubah data siswa menulis jejak audit ubah_data dengan keterangan identitas yang benar.
+     */
+    public function test_ubah_data_siswa_menulis_jejak_audit(): void
+    {
+        $siswaUji = User::factory()->create([
+            'nama_lengkap' => 'Eka Pratama',
+            'username' => 'eka_pratama',
+            'email' => 'eka@siswa.test',
+            'kelas' => 'XI MIPA 1',
+            'peran' => 'siswa',
         ]);
-        $resUpdate->assertRedirect(route('admin.pengguna.show', $siswaBaru));
-        $siswaBaru->refresh();
-        $this->assertSame('Citra Lestari Dewi', $siswaBaru->nama_lengkap);
-        $this->assertSame('citra_dewi@siswa.test', $siswaBaru->email);
-        $this->assertSame('XI MIPA 4', $siswaBaru->kelas);
-        $this->assertSame('siswa', $siswaBaru->peran);
+
+        $resUpdate = $this->actingAs($this->admin)->put(route('admin.pengguna.update', $siswaUji), [
+            'nama_lengkap' => 'Eka Pratama Putra',
+            'username' => 'eka_pratama',
+            'email' => 'eka_putra@siswa.test',
+            'kelas' => 'XI MIPA 2',
+            'peran' => 'admin', // Diabaikan
+        ]);
+
+        $resUpdate->assertRedirect(route('admin.pengguna.show', $siswaUji));
+        $siswaUji->refresh();
+        $this->assertSame('Eka Pratama Putra', $siswaUji->nama_lengkap);
+        $this->assertSame('eka_putra@siswa.test', $siswaUji->email);
+        $this->assertSame('XI MIPA 2', $siswaUji->kelas);
+        $this->assertSame('siswa', $siswaUji->peran);
+
+        // Jejak audit ubah_data tertulis
+        $this->assertDatabaseHas('riwayat_tindakan_admin', [
+            'admin_id' => $this->admin->id,
+            'siswa_id' => $siswaUji->id,
+            'jenis' => 'ubah_data',
+            'keterangan' => 'Memperbarui data identitas profil siswa.',
+        ]);
     }
 
     /**
@@ -269,7 +312,16 @@ class AdminPenggunaTest extends TestCase
 
         $this->siswa->refresh();
         $this->assertTrue($this->siswa->wajib_ganti_password);
+        // Pastikan kolom password adalah hash (bukan teks biasa)
+        $this->assertNotSame($sandiSementara, $this->siswa->password);
         $this->assertTrue(Hash::check($sandiSementara, $this->siswa->password));
+
+        // Pastikan kata sandi sementara TIDAK bocor di berkas log
+        $logPath = storage_path('logs/laravel.log');
+        if (file_exists($logPath)) {
+            $isiLog = file_get_contents($logPath);
+            $this->assertStringNotContainsString($sandiSementara, $isiLog);
+        }
 
         // Jejak audit reset password
         $this->assertDatabaseHas('riwayat_tindakan_admin', [
@@ -466,14 +518,17 @@ class AdminPenggunaTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $siswaKembar1->id]);
 
         // Coba hapus akun tanpa data ($siswaKembar2) -> berhasil
+        $idSiswaKembar2 = $siswaKembar2->id;
         $resHapusKosong = $this->actingAs($this->admin)->delete(route('admin.pengguna.destroy', $siswaKembar2));
         $resHapusKosong->assertRedirect(route('admin.pengguna.ganda'));
-        $this->assertDatabaseMissing('users', ['id' => $siswaKembar2->id]);
+        $this->assertDatabaseMissing('users', ['id' => $idSiswaKembar2]);
 
-        // Jejak audit hapus tercatat
+        // Jejak audit hapus tetap ada, siswa_id menjadi null, dan keterangan menyimpan identitas siswa
         $this->assertDatabaseHas('riwayat_tindakan_admin', [
             'admin_id' => $this->admin->id,
+            'siswa_id' => null,
             'jenis' => 'hapus',
+            'keterangan' => 'Menghapus akun kosong siswa: dewi sartika (dewi_2).',
         ]);
 
         // Admin tidak bisa menghapus dirinya sendiri

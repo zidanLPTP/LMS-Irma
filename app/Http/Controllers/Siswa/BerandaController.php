@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
+use App\Models\Pengumuman;
 use App\Services\BukaAksesService;
 use Illuminate\View\View;
 
@@ -36,12 +37,18 @@ class BerandaController extends Controller
             }
         }
 
+        // 4. Ambil maksimal 3 pengumuman aktif yang belum kedaluwarsa (disematkan di atas)
+        $pengumumanTerbaru = Pengumuman::aktifUntukSiswa()->limit(3)->get();
+        $pengumumanDibacaIds = $user->pengumumanDibaca()->pluck('pengumuman_id')->toArray();
+
         return view('siswa.beranda', compact(
             'daftarLangkah',
             'totalLangkah',
             'langkahSelesai',
             'persentaseProgres',
-            'langkahLanjutan'
+            'langkahLanjutan',
+            'pengumumanTerbaru',
+            'pengumumanDibacaIds'
         ));
     }
 }

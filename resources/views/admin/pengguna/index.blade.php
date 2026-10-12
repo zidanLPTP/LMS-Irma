@@ -11,6 +11,10 @@
                     <x-ikon nama="users" ukuran="16" />
                     <span>{{ __('pengguna.deteksi_ganda') }}</span>
                 </a>
+                <a href="{{ route('admin.impor-siswa.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold bg-white text-ink border border-border hover:bg-surface hover:border-green-700 transition-colors">
+                    <x-ikon nama="upload" ukuran="16" />
+                    <span>Impor Excel</span>
+                </a>
                 <a href="{{ route('admin.pengguna.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold bg-green-700 text-white hover:bg-green-800 shadow-sm transition-colors">
                     <x-ikon nama="plus" ukuran="16" />
                     <span>{{ __('pengguna.tambah_siswa') }}</span>

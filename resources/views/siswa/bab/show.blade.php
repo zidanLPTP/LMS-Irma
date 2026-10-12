@@ -26,7 +26,12 @@
 
         <!-- Daftar Materi Sebagai Kartu -->
         <div class="space-y-4">
-            <h2 class="text-lg font-extrabold text-ink">Materi Pembelajaran</h2>
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-extrabold text-ink">Materi Pembelajaran</h2>
+                <span class="text-xs font-bold text-muted bg-surface px-3 py-1 rounded-full border border-border">
+                    <strong class="text-green-700">{{ $jumlahMateriSelesai ?? 0 }}</strong> dari {{ $totalMateri ?? 0 }} materi selesai
+                </span>
+            </div>
 
             @if ($daftarMateri->isEmpty())
                 <x-kartu class="p-8 text-center text-muted">
@@ -37,6 +42,7 @@
                     @foreach ($daftarMateri as $index => $materi)
                         @php
                             $sudahDibuka = isset($materiDibukaIds[$materi->id]);
+                            $sudahSelesai = isset($materiSelesaiIds[$materi->id]);
                         @endphp
 
                         <a href="{{ route('siswa.bab.materi.show', [$bab, $materi]) }}"
@@ -65,10 +71,15 @@
                                 </div>
 
                                 <div class="flex items-center gap-3 shrink-0">
-                                    @if ($sudahDibuka)
+                                    @if ($sudahSelesai)
+                                        <span class="inline-flex items-center gap-1 text-xs font-bold text-green-800 bg-green-100 border border-green-200 px-2.5 py-1 rounded-full">
+                                            <x-ikon nama="check-circle" ukuran="12" />
+                                            <span>Selesai</span>
+                                        </span>
+                                    @elseif ($sudahDibuka)
                                         <span class="inline-flex items-center gap-1 text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
                                             <x-ikon nama="check" ukuran="12" />
-                                            <span>Sudah dipelajari</span>
+                                            <span>Sudah dibuka</span>
                                         </span>
                                     @endif
                                     <span class="text-muted group-hover:text-green-700 transition-transform group-hover:translate-x-1">

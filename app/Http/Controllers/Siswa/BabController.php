@@ -32,17 +32,37 @@ class BabController extends Controller
         // 2. Ambil daftar materi berurutan
         $daftarMateri = $bab->materi()->orderBy('urutan')->get();
 
-        // 3. Status selesai tiap materi bagi siswa
-        $materiDibukaIds = $user->progresMateri()
+        // 3. Status buka dan tanda selesai tiap materi bagi siswa
+        $progresMateri = $user->progresMateri()
             ->whereIn('materi_id', $daftarMateri->pluck('id'))
+            ->get();
+
+        $materiDibukaIds = $progresMateri
             ->where('sudah_dibuka', true)
             ->pluck('materi_id')
             ->flip()
             ->all();
 
+        $materiSelesaiIds = $progresMateri
+            ->whereNotNull('selesai_pada')
+            ->pluck('materi_id')
+            ->flip()
+            ->all();
+
+        $totalMateri = $daftarMateri->count();
+        $jumlahMateriSelesai = count($materiSelesaiIds);
+
         // 4. Kuis bab (bila ada)
         $kuis = $bab->kuis;
 
-        return view('siswa.bab.show', compact('bab', 'daftarMateri', 'materiDibukaIds', 'kuis'));
+        return view('siswa.bab.show', compact(
+            'bab',
+            'daftarMateri',
+            'materiDibukaIds',
+            'materiSelesaiIds',
+            'totalMateri',
+            'jumlahMateriSelesai',
+            'kuis'
+        ));
     }
 }

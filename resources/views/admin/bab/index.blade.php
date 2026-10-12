@@ -88,6 +88,10 @@
                                 </td>
                                 <td class="px-4 py-3 text-right">
                                     <div class="flex items-center justify-end gap-2">
+                                        <x-tombol tipe="garis" href="{{ route('admin.pratinjau.bab', $bab) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs text-amber-800 border-amber-300 hover:bg-amber-50">
+                                            <x-ikon nama="eye" ukuran="14" />
+                                            <span>Pratinjau</span>
+                                        </x-tombol>
                                         <x-tombol tipe="garis" href="{{ route('admin.bab.edit', $bab) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs">
                                             <x-ikon nama="pencil" ukuran="14" />
                                             <span>Ubah</span>
