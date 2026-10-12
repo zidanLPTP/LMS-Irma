@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" width="520" height="120" fill="none">
+  <!-- BioSTEMX - Konsep E: Happy Cell Explorer (Kupu-kupu / Sel Berpendar Imut) -->
+  <g id="mark" transform="translate(18, 12)">
+    <!-- Alas bundar cawan lembut -->
+    <rect x="4" y="4" width="88" height="88" rx="28" fill="#EFF8FD"/>
+
+    <!-- 4 Organel Bulat Gemuk Bersilangan Membentuk X (Biologi Sel & Bunga) -->
+    <!-- Organel Atas Kiri (Hijau Daun Tua Lembut) -->
+    <ellipse cx="32" cy="32" rx="15" ry="17" transform="rotate(-30 32 32)" fill="#2F7D5B"/>
+    <!-- Organel Atas Kanan (Biru Langit Segar) -->
+    <ellipse cx="64" cy="32" rx="15" ry="17" transform="rotate(30 64 32)" fill="#4FAFDD"/>
+    <!-- Organel Bawah Kiri (Biru Laut) -->
+    <ellipse cx="32" cy="64" rx="15" ry="17" transform="rotate(30 32 64)" fill="#1F6F9C"/>
+    <!-- Organel Bawah Kanan (Hijau Terang) -->
+    <ellipse cx="64" cy="64" rx="15" ry="17" transform="rotate(-30 64 64)" fill="#5DB88A"/>
+
+    <!-- Inti Sel Bulat Imut di Tengah (Karakter Eksplorasi) -->
+    <circle cx="48" cy="48" r="14" fill="#FFFFFF"/>
+    <circle cx="48" cy="48" r="10" fill="#DCF3E6"/>
+    <!-- Senyum mikroskopis ramah / lengkung hidup -->
+    <path d="M 43 47 Q 48 53 53 47" stroke="#2F7D5B" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="44" cy="44" r="1.5" fill="#2F7D5B"/>
+    <circle cx="52" cy="44" r="1.5" fill="#2F7D5B"/>
+  </g>
+
+  <!-- Wordmark Nunito Bulat Ramah -->
+  <g id="wordmark" transform="translate(132, 72)">
+    <text font-family="Nunito, system-ui, -apple-system, sans-serif" font-size="44" font-weight="900" fill="#1F2D2A" letter-spacing="-0.5">
+      Bio<tspan fill="#2F7D5B">STEM</tspan><tspan fill="#4FAFDD">X</tspan>
+    </text>
+    <text y="24" font-family="Nunito, system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#5B6B66" letter-spacing="2.5">
+      PENELITIAN &amp; SAINS SISWA
+    </text>
+  </g>
+</svg>

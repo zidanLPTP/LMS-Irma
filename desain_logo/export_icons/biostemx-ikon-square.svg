@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><g transform="translate(10.69 10.69) scale(2.444)" fill="none">
+  <!-- BioSTEMX - Favicon & App Icon: Happy Cell Explorer -->
+  <!-- Alas bulat sudut melengkung cawan petri ramah -->
+  <rect x="4" y="4" width="88" height="88" rx="28" fill="#EFF8FD"/>
+
+  <!-- 4 Organel Bulat Gemuk Bersilangan Membentuk X (Biologi Sel & Bunga) -->
+  <!-- Organel Atas Kiri (Hijau Daun Tua Lembut #2F7D5B) -->
+  <ellipse cx="32" cy="32" rx="15" ry="17" transform="rotate(-30 32 32)" fill="#2F7D5B"/>
+  <!-- Organel Atas Kanan (Biru Langit Segar #4FAFDD) -->
+  <ellipse cx="64" cy="32" rx="15" ry="17" transform="rotate(30 64 32)" fill="#4FAFDD"/>
+  <!-- Organel Bawah Kiri (Biru Laut #1F6F9C) -->
+  <ellipse cx="32" cy="64" rx="15" ry="17" transform="rotate(30 32 64)" fill="#1F6F9C"/>
+  <!-- Organel Bawah Kanan (Hijau Terang #5DB88A) -->
+  <ellipse cx="64" cy="64" rx="15" ry="17" transform="rotate(-30 64 64)" fill="#5DB88A"/>
+
+  <!-- Inti Sel Bulat Imut di Tengah (Karakter Eksplorasi) -->
+  <circle cx="48" cy="48" r="14" fill="#FFFFFF"/>
+  <circle cx="48" cy="48" r="10" fill="#DCF3E6"/>
+  <!-- Senyum mikroskopis ramah & mata ramah -->
+  <path d="M 43 47 Q 48 53 53 47" stroke="#2F7D5B" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="44" cy="44" r="1.5" fill="#2F7D5B"/>
+  <circle cx="52" cy="44" r="1.5" fill="#2F7D5B"/>
+</g></svg>
