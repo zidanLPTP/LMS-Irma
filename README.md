@@ -1,58 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# BioSTEMX — LMS Penelitian Biologi Sekolah
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+BioSTEMX adalah platform *Learning Management System* (LMS) berbasis web yang dirancang khusus untuk mendukung penelitian pembelajaran biologi di tingkat SMA. Platform ini memungkinkan siswa belajar secara mandiri, terstruktur, dan berurutan melalui pendekatan STEM (*Science, Technology, Engineering, and Mathematics*) dengan antarmuka yang ramah, modern, dan nyaman diakses melalui perangkat seluler (*mobile-first*).
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🔬 Makna Nama & Identitas
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Bio**: Penelitian materi biologi (ekosistem, genetika, sel, dan fenomena kehidupan).
+- **STEM**: Pembelajaran terpadu sains, teknologi, rekayasa, dan matematika dengan alur berpikir analitis dan pemecahan masalah.
+- **X (*Explorer*)**: Eksplorasi aktif dan mandiri oleh siswa melalui rangkaian bab, materi multimedia, dan evaluasi berkala.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## ✨ Fitur Utama
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Pembelajaran Berurutan untuk Siswa
+- **Alur Bertahap:** Pretest → Bab 1 sampai Bab N (dinamis) → Posttest.
+- **Buka Akses Bab:** Bab berikutnya terbuka secara otomatis jika siswa **lulus kuis** (nilai ≥ 65 pada soal otomatis) **ATAU** telah menghabiskan **2 kesempatan** percobaan kuis.
+- **Materi Interaktif:** Mendukung teks kaya, video YouTube (*privacy-enhanced nocookie*), berkas presentasi/modul PDF privat terproteksi, serta penanda progres "Tandai Selesai" mandiri.
+- **Timer Kuis Server-Side:** Waktu pengerjaan (bawaan 60 detik per soal) divalidasi ketat di sisi server untuk mencegah manipulasi waktu di peramban.
+- **Pencarian Materi:** Pencarian instan untuk menemukan topik dan materi pada bab-bab yang telah terbuka dan terbit.
+- **Nilai Saya & Notifikasi:** Rekap riwayat percobaan nilai terbaik serta notifikasi penting (evaluasi esai guru, reset kesempatan, dan pengumuman sekolah).
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Panel Pengelolaan untuk Guru / Peneliti (Admin)
+- **Dasbor Statistik:** Pemantauan progres belajar 100+ siswa, rata-rata nilai, siswa aktif hari ini, dan aktivitas kuis terkini.
+- **Manajemen Kurikulum:** Kelola bab, materi (teks/video/PDF), kuis, dan bank soal (Pilihan Ganda, Isian Singkat, dan Esai).
+- **Penilaian Esai:** Antarmuka khusus untuk koreksi jawaban esai siswa disertai rubrik dan catatan umpan balik guru.
+- **Impor Data Cepat (Excel):**
+  - Impor akun siswa massal hingga 200 baris dengan pembuatan kata sandi acak atomik dan templat panduan.
+  - Impor bank soal dari Excel lengkap dengan validasi integritas data.
+- **Pelacakan & Audit Akses:** Rekapitulasi waktu masuk, durasi sesi belajar (*heartbeat/detak jantung* berkala), dan riwayat tindakan admin.
+- **Ekspor Laporan (Excel):** Ekspor rekap akses dan nilai siswa ke dalam format `.xlsx` dengan formula aman (*neutralized formula injection*).
+- **Pratinjau Sebagai Siswa:** Mode simulasi bagi guru untuk memeriksa tampilan materi dan kuis tanpa memengaruhi riwayat atau progres belajar nyata.
+- **Kontrol Pendaftaran:** Opsi buka/tutup pendaftaran publik mandiri dan verifikasi kode pendaftaran khusus.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## 🛠️ Tumpukan Teknologi (*Tech Stack*)
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- **Backend:** Laravel 13, PHP 8.4
+- **Basis Data:** MySQL / MariaDB
+- **Frontend:** Blade Templating, Tailwind CSS, Alpine.js, Ikon Lucide
+- **Manipulasi Excel:** `maatwebsite/excel` & `PhpSpreadsheet`
+- **Penyaji Dokumen:** PDF.js
+- **Pengujian & Kualitas Kode:** PHPUnit, Laravel Pint, Playwright (E2E visual browser)
 
+---
+
+## 🚀 Panduan Instalasi Lokal
+
+### 1. Kebutuhan Sistem
+- PHP >= 8.4 (ekstensi `pdo_mysql`, `mbstring`, `gd` / `imagick`, `zip`, `xml`)
+- Composer >= 2.x
+- Node.js & NPM
+- MySQL / MariaDB Server
+
+### 2. Langkah Pemasangan
 ```bash
-composer require laravel/boost --dev
+# 1. Gandakan repositori
+git clone <url-repositori>
+cd LMS
 
-php artisan boost:install
+# 2. Pasang dependensi PHP
+composer install
+
+# 3. Siapkan berkas environment
+cp .env.example .env
+php artisan key:generate
+
+# 4. Atur konfigurasi basis data di .env (DB_DATABASE, DB_USERNAME, DB_PASSWORD)
+
+# 5. Jalankan migrasi dan seeder awal
+php artisan migrate --seed
+
+# 6. Pasang dependensi JavaScript & bangun aset frontend
+npm install
+npm run build
+
+# 7. Jalankan server lokal
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Akses sistem di peramban melalui alamat: `http://localhost:8000`
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🧪 Pengujian & Standar Kode
 
-## Code of Conduct
+Jalankan perintah berikut sebelum melakukan komit kode:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# Menjalankan seluruh pengujian logika bisnis (130+ Feature & Unit tests)
+php artisan test
 
-## Security Vulnerabilities
+# Merapikan gaya penulisan kode sesuai standar Laravel Pint
+./vendor/bin/pint
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Menjalankan pengujian E2E browser Playwright (opsional lokal)
+npx playwright test
+```
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🔒 Keamanan & Prinsip Desain
+
+- **Keamanan OWASP:** Perlindungan terhadap SQL Injection via Eloquent ORM, XSS dengan *output escaping*, CSRF token di setiap formulir, *rate limiting / throttling* pada rute sensitif, serta netralisasi injeksi formula pada lembar ekspor Excel.
+- **Optimal Shared Hosting:** Dirancang hemat sumber daya (driver antrean `sync`/`database`, video embed YouTube tanpa beban transkoding lokal, tanpa dependensi background worker berat).
+- **Bahasa & Istilah:** Seluruh antarmuka pengguna memakai Bahasa Indonesia yang baku, sederhana, dan ramah untuk pelajar sekolah menengah.
+
+---
+
+## 📄 Lisensi
+
+Platform ini dikembangkan untuk keperluan penelitian pendidikan dan dilisensikan di bawah lisensi terbuka [MIT](LICENSE).
