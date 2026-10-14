@@ -16,7 +16,13 @@
 /public/build
 /public/hot
 /public/storage
+/public/unggahan/*
+!/public/unggahan/.gitkeep
 /storage/*.key
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/app/materi/*
+!/storage/app/materi/.gitkeep
 /storage/pail
 /vendor
 Homestead.json

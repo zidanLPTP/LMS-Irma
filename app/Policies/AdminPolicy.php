@@ -11,6 +11,25 @@ class AdminPolicy
      */
     public function before(User $user, string $ability): ?bool
     {
-        return $user->isAdmin() ? true : null;
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        return null;
+    }
+
+    public function view(User $user, mixed $model): bool
+    {
+        return $user->isAdmin();
+    }
+
+    public function update(User $user, mixed $model): bool
+    {
+        return $user->isAdmin();
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->isAdmin();
     }
 }

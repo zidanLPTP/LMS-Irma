@@ -114,11 +114,21 @@ class User extends Authenticatable
         return $this->peran === 'admin';
     }
 
+    public function apakahAdmin(): bool
+    {
+        return $this->isAdmin();
+    }
+
     /**
      * Cek apakah pengguna adalah siswa.
      */
     public function isSiswa(): bool
     {
         return $this->peran === 'siswa';
+    }
+
+    public function apakahSiswa(): bool
+    {
+        return $this->isSiswa();
     }
 }

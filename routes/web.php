@@ -43,7 +43,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/masuk', [MasukController::class, 'store'])->name('masuk.kirim');
 
     Route::get('/daftar', [DaftarController::class, 'create'])->name('daftar');
-    Route::post('/daftar', [DaftarController::class, 'store'])->name('daftar.kirim');
+    Route::post('/daftar', [DaftarController::class, 'store'])->middleware('throttle:10,60')->name('daftar.kirim');
 });
 
 // Keluar (Harus Login)
@@ -129,9 +129,9 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
 
     // Laporan Admin (Akses & Nilai)
     Route::get('laporan/akses', [LaporanAksesController::class, 'index'])->name('laporan.akses');
-    Route::get('laporan/akses/ekspor', [LaporanAksesController::class, 'ekspor'])->name('laporan.akses.ekspor');
+    Route::get('laporan/akses/ekspor', [LaporanAksesController::class, 'ekspor'])->middleware('throttle:15,1')->name('laporan.akses.ekspor');
     Route::get('laporan/nilai', [LaporanNilaiController::class, 'index'])->name('laporan.nilai');
-    Route::get('laporan/nilai/ekspor', [LaporanNilaiController::class, 'ekspor'])->name('laporan.nilai.ekspor');
+    Route::get('laporan/nilai/ekspor', [LaporanNilaiController::class, 'ekspor'])->middleware('throttle:15,1')->name('laporan.nilai.ekspor');
 
     // Kelola Pengguna (Siswa)
     Route::get('pengguna/ganda', [PenggunaController::class, 'ganda'])->name('pengguna.ganda');
@@ -143,15 +143,15 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
     // Impor Siswa dari Excel
     Route::get('impor-siswa/templat', [ImporSiswaController::class, 'unduhTemplat'])->name('impor-siswa.templat');
     Route::get('impor-siswa', [ImporSiswaController::class, 'create'])->name('impor-siswa.create');
-    Route::post('impor-siswa/pratinjau', [ImporSiswaController::class, 'pratinjau'])->name('impor-siswa.pratinjau');
-    Route::post('impor-siswa/konfirmasi', [ImporSiswaController::class, 'konfirmasi'])->name('impor-siswa.konfirmasi');
-    Route::get('impor-siswa/unduh-akun', [ImporSiswaController::class, 'unduhAkun'])->name('impor-siswa.unduh-akun');
+    Route::post('impor-siswa/pratinjau', [ImporSiswaController::class, 'pratinjau'])->middleware('throttle:20,1')->name('impor-siswa.pratinjau');
+    Route::post('impor-siswa/konfirmasi', [ImporSiswaController::class, 'konfirmasi'])->middleware('throttle:10,1')->name('impor-siswa.konfirmasi');
+    Route::get('impor-siswa/unduh-akun', [ImporSiswaController::class, 'unduhAkun'])->middleware('throttle:15,1')->name('impor-siswa.unduh-akun');
 
     // Impor Soal Kuis dari Excel
     Route::get('impor-soal/templat', [ImporSoalController::class, 'unduhTemplat'])->name('impor-soal.templat');
     Route::get('kuis/{kuis}/impor-soal', [ImporSoalController::class, 'create'])->name('impor-soal.create');
-    Route::post('kuis/{kuis}/impor-soal/pratinjau', [ImporSoalController::class, 'pratinjau'])->name('impor-soal.pratinjau');
-    Route::post('kuis/{kuis}/impor-soal/konfirmasi', [ImporSoalController::class, 'konfirmasi'])->name('impor-soal.konfirmasi');
+    Route::post('kuis/{kuis}/impor-soal/pratinjau', [ImporSoalController::class, 'pratinjau'])->middleware('throttle:20,1')->name('impor-soal.pratinjau');
+    Route::post('kuis/{kuis}/impor-soal/konfirmasi', [ImporSoalController::class, 'konfirmasi'])->middleware('throttle:10,1')->name('impor-soal.konfirmasi');
 
     // Mode Pratinjau Sebagai Siswa oleh Admin
     Route::prefix('pratinjau')->name('pratinjau.')->group(function () {

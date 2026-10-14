@@ -74,6 +74,19 @@ class ImporSoalService
 
             $alasanGalat = [];
 
+            // Periksa keberadaan rumus Excel (dimulai dengan '=') di seluruh kolom baris soal
+            $adaRumus = false;
+            foreach ($kolom as $nilaiKolom) {
+                if ($nilaiKolom !== null && str_starts_with(trim((string) $nilaiKolom), '=')) {
+                    $adaRumus = true;
+                    break;
+                }
+            }
+
+            if ($adaRumus) {
+                $alasanGalat[] = 'rumus tidak diizinkan.';
+            }
+
             if (! in_array($tipe, ['pilihan_ganda', 'isian', 'esai'], true)) {
                 $alasanGalat[] = "Tipe soal tidak valid ('{$tipe}'). Gunakan pilihan_ganda, isian, atau esai.";
             }

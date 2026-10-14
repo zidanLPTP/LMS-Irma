@@ -51,9 +51,9 @@ class ImporSiswaService
             throw new \InvalidArgumentException('Berkas tidak memiliki kolom wajib: nama_lengkap, username, email.');
         }
 
-        // Batas maksimal 200 baris data
-        if (count($semuaBaris) > 200) {
-            throw new \InvalidArgumentException('Jumlah baris data melebihi batas maksimal 200 baris.');
+        // Batas maksimal 100 baris data (disesuaikan agar tahap konfirmasi aman dari timeout tanpa menurunkan biaya hash)
+        if (count($semuaBaris) > 100) {
+            throw new \InvalidArgumentException('Jumlah baris data melebihi batas maksimal 100 baris.');
         }
 
         $barisValid = [];
@@ -78,7 +78,18 @@ class ImporSiswaService
                 continue;
             }
 
-            $alasanGalat = [];
+            // Periksa keberadaan rumus Excel (dimulai dengan '=') di semua kolom
+            $adaRumus = false;
+            foreach ([$nama, $username, $email, $kelas] as $nilaiKolom) {
+                if ($nilaiKolom !== null && str_starts_with($nilaiKolom, '=')) {
+                    $adaRumus = true;
+                    break;
+                }
+            }
+
+            if ($adaRumus) {
+                $alasanGalat[] = 'rumus tidak diizinkan.';
+            }
 
             if ($nama === '') {
                 $alasanGalat[] = 'Nama lengkap wajib diisi.';

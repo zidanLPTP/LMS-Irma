@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CatatAktivitas;
+use App\Http\Middleware\HeaderKeamanan;
 use App\Http\Middleware\PeranMiddleware;
 use App\Http\Middleware\PeriksaAkunAktifDanPassword;
 use Illuminate\Foundation\Application;
@@ -17,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            HeaderKeamanan::class,
+        ]);
+
         $middleware->alias([
             'peran' => PeranMiddleware::class,
             'catat.aktivitas' => CatatAktivitas::class,

@@ -28,17 +28,17 @@
     <header class="bg-white border-b border-border sticky top-0 z-30">
         <div class="max-w-[1000px] mx-auto px-4 h-16 flex items-center justify-between">
             @php
-                $namaSitusApp = \App\Models\Pengaturan::ambil('nama_situs', config('app.name', 'Biologi SMA'));
-                $logoSitusApp = \App\Models\Pengaturan::ambil('logo_situs');
+                $namaSitusApp = \App\Models\Pengaturan::ambil('nama_situs', config('app.name', 'BioSTEMX'));
+                $logoSitusApp = \App\Models\Pengaturan::ambil('logo_situs', 'gambar/logo_biostemx.png');
             @endphp
-            <div class="flex items-center gap-6">
-                <a href="{{ route('siswa.beranda') }}" class="flex items-center gap-2 text-green-700 font-extrabold text-lg">
+            <div class="flex items-center gap-3 sm:gap-6 shrink-0">
+                <a href="{{ route('siswa.beranda') }}" class="flex items-center gap-2 text-green-700 font-extrabold text-base sm:text-lg">
                     @if ($logoSitusApp && file_exists(public_path($logoSitusApp)))
-                        <img src="{{ asset($logoSitusApp) }}" alt="Logo" class="h-8 w-auto max-w-[120px] object-contain">
+                        <img src="{{ asset($logoSitusApp) }}" alt="BioSTEMX" width="156" height="36" class="h-9 w-auto max-w-[130px] sm:max-w-[156px] object-contain">
                     @else
                         <x-ikon nama="leaf" ukuran="24" kelas="text-green-700" />
+                        <span>{{ $namaSitusApp }}</span>
                     @endif
-                    <span>{{ $namaSitusApp }}</span>
                 </a>
 
                 <!-- Navigasi Laptop / Tablet (Top Bar) -->
@@ -66,8 +66,8 @@
                 </nav>
             </div>
 
-            <div class="flex items-center gap-2 sm:gap-3">
-                <!-- Kolom Pencarian Siswa di Header -->
+            <div class="flex items-center gap-1.5 sm:gap-3" x-data="{ bukaCariHp: false }">
+                <!-- Kolom Pencarian Siswa di Header (Desktop) -->
                 <form method="GET" action="{{ route('siswa.cari') }}" class="relative hidden md:block">
                     <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari bab / materi..." minlength="2" required
                         class="w-44 lg:w-56 rounded-xl border border-border pl-8 pr-3 py-1.5 text-xs text-ink bg-surface focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-700 transition-all">
@@ -76,18 +76,19 @@
                     </div>
                 </form>
 
-                <a href="{{ route('siswa.cari') }}" class="md:hidden p-2 rounded-xl text-ink hover:bg-surface transition-colors" aria-label="Cari Materi">
-                    <x-ikon nama="search" ukuran="20" kelas="text-ink" />
-                </a>
+                <!-- Tombol Pencarian Mobile (Ciutkan menjadi ikon) -->
+                <button type="button" @click="bukaCariHp = !bukaCariHp" class="md:hidden p-2 rounded-xl text-ink hover:bg-surface transition-colors" aria-label="Buka Pencarian">
+                    <x-ikon nama="search" ukuran="18" kelas="text-ink" />
+                </button>
 
                 @php
                     $jumlahNotifikasiBelumDibaca = auth()->user()->notifikasi()->whereNull('dibaca_pada')->count();
                 @endphp
                 <!-- Ikon Lonceng Notifikasi Lucide -->
                 <a href="{{ route('siswa.notifikasi.index') }}" class="relative p-2 rounded-xl text-ink hover:bg-surface transition-colors" aria-label="Notifikasi">
-                    <x-ikon nama="bell" ukuran="20" kelas="text-ink" />
+                    <x-ikon nama="bell" ukuran="18" kelas="text-ink" />
                     @if ($jumlahNotifikasiBelumDibaca > 0)
-                        <span class="absolute top-1 right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black leading-none text-white bg-rose-600 rounded-full">
+                        <span class="absolute top-1 right-1 inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-black leading-none text-white bg-rose-600 rounded-full">
                             {{ $jumlahNotifikasiBelumDibaca > 99 ? '99+' : $jumlahNotifikasiBelumDibaca }}
                         </span>
                     @endif
@@ -104,10 +105,30 @@
 
                 <form method="POST" action="{{ route('keluar') }}" class="inline" onsubmit="try { Object.keys(localStorage).forEach(k => { if (k.startsWith('draf_esai_')) localStorage.removeItem(k); }); } catch (e) {}">
                     @csrf
-                    <x-tombol tipe="garis" class="!min-h-[38px] !px-3.5 !py-1.5 text-xs font-bold">
+                    <x-tombol tipe="garis" class="!min-h-[34px] sm:!min-h-[38px] !px-2.5 sm:!px-3.5 !py-1 text-xs font-bold">
                         Keluar
                     </x-tombol>
                 </form>
+
+                <!-- Panel Input Pencarian Mengambang di Mobile (saat ikon pencarian dibuka) -->
+                <div x-show="bukaCariHp" x-cloak @click.away="bukaCariHp = false"
+                    x-transition:enter="transition ease-out duration-150"
+                    x-transition:enter-start="opacity-0 -translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    class="md:hidden absolute top-16 left-0 w-full bg-white border-b border-border p-3 shadow-md z-40">
+                    <form method="GET" action="{{ route('siswa.cari') }}" class="flex items-center gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Ketik kata kunci bab / materi..." minlength="2" required autofocus
+                                class="w-full rounded-xl border border-border pl-9 pr-3 py-2 text-xs text-ink bg-surface focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-700">
+                            <div class="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none">
+                                <x-ikon nama="search" ukuran="16" />
+                            </div>
+                        </div>
+                        <x-tombol tipe="utama" class="!min-h-[36px] !px-3 text-xs font-bold">
+                            Cari
+                        </x-tombol>
+                    </form>
+                </div>
             </div>
         </div>
     </header>

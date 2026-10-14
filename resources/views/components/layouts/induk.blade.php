@@ -21,10 +21,17 @@
 </head>
 <body class="h-full font-sans text-ink antialiased bg-bg flex flex-col justify-between">
     <header class="bg-white border-b border-border sticky top-0 z-30">
-        <div class="max-w-[1100px] mx-auto px-4 h-16 flex items-center justify-between">
+            @php
+                $namaSitusApp = \App\Models\Pengaturan::ambil('nama_situs', config('app.name', 'BioSTEMX'));
+                $logoSitusApp = \App\Models\Pengaturan::ambil('logo_situs', 'gambar/logo_biostemx.png');
+            @endphp
             <a href="/" class="flex items-center gap-2 text-green-700 font-extrabold text-lg">
-                <x-ikon nama="leaf" ukuran="24" kelas="text-green-700" />
-                <span>LMS Biologi</span>
+                @if ($logoSitusApp && file_exists(public_path($logoSitusApp)))
+                    <img src="{{ asset($logoSitusApp) }}" alt="BioSTEMX" width="156" height="36" class="h-9 w-auto max-w-[160px] object-contain">
+                @else
+                    <x-ikon nama="leaf" ukuran="24" kelas="text-green-700" />
+                    <span>{{ $namaSitusApp }}</span>
+                @endif
             </a>
 
             @auth

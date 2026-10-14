@@ -108,8 +108,8 @@ class ImporSiswaController extends Controller
             return redirect()->route('admin.pengguna.index')->with('galat', 'Sesi data kata sandi sementara telah berakhir dan tidak dapat diakses lagi.');
         }
 
-        // Tahan flash session agar unduhan tidak langsung menghilangkannya saat reload
-        session()->keep(['hasil_impor_siswa']);
+        // Hapus dari sesi setelah diunduh sehingga tidak bisa diunduh ulang (sekali unduh/tampil)
+        session()->forget('hasil_impor_siswa');
 
         return Excel::download(new UnduhAkunSementaraExport($daftarAkun), 'daftar_akun_siswa_sementara.xlsx');
     }

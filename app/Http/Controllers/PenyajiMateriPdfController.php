@@ -55,6 +55,7 @@ class PenyajiMateriPdfController extends Controller
         ]);
 
         $response->headers->set('Cache-Control', 'private, no-cache, must-revalidate');
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
 
         return $response;
     }

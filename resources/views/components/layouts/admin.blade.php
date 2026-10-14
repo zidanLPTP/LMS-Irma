@@ -25,8 +25,8 @@
     <header class="bg-white border-b border-border sticky top-0 z-30">
         <div class="max-w-[1200px] mx-auto px-4 h-16 flex items-center justify-between">
             @php
-                $namaSitusApp = \App\Models\Pengaturan::ambil('nama_situs', config('app.name', 'LMS Penelitian Sekolah'));
-                $logoSitusApp = \App\Models\Pengaturan::ambil('logo_situs');
+                $namaSitusApp = \App\Models\Pengaturan::ambil('nama_situs', config('app.name', 'BioSTEMX'));
+                $logoSitusApp = \App\Models\Pengaturan::ambil('logo_situs', 'gambar/logo_biostemx.png');
             @endphp
             <div class="flex items-center gap-3">
                 <button type="button" @click="bukaMenuHp = !bukaMenuHp" class="lg:hidden p-2 rounded-xl text-ink hover:bg-green-50 focus:outline-none" aria-label="Buka Menu Navigasi">
@@ -34,11 +34,11 @@
                 </button>
                 <a href="{{ route('admin.beranda') }}" class="flex items-center gap-2 text-green-700 font-extrabold text-lg">
                     @if ($logoSitusApp && file_exists(public_path($logoSitusApp)))
-                        <img src="{{ asset($logoSitusApp) }}" alt="Logo" class="h-8 w-auto max-w-[120px] object-contain">
+                        <img src="{{ asset($logoSitusApp) }}" alt="BioSTEMX" width="156" height="36" class="h-9 w-auto max-w-[156px] object-contain">
                     @else
                         <x-ikon nama="leaf" ukuran="24" kelas="text-green-700" />
+                        <span>{{ $namaSitusApp }}</span>
                     @endif
-                    <span>{{ $namaSitusApp }}</span>
                 </a>
             </div>
 

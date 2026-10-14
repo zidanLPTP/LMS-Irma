@@ -100,19 +100,19 @@ class Langkah14FiturLengkapTest extends TestCase
             ->assertSessionHasErrors('berkas');
     }
 
-    public function test_impor_siswa_menolak_berkas_lebih_dari_200_baris(): void
+    public function test_impor_siswa_menolak_berkas_lebih_dari_100_baris(): void
     {
         $service = app(ImporSiswaService::class);
 
         $baris = [['nama_lengkap', 'username', 'email', 'kelas']];
-        for ($i = 1; $i <= 205; $i++) {
+        for ($i = 1; $i <= 105; $i++) {
             $baris[] = ["Siswa {$i}", "siswa_{$i}", "siswa{$i}@test.com", 'XI'];
         }
 
-        $berkas = $this->buatBerkasXlsx($baris, '205_siswa.xlsx');
+        $berkas = $this->buatBerkasXlsx($baris, '105_siswa.xlsx');
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Jumlah baris data melebihi batas maksimal 200 baris.');
+        $this->expectExceptionMessage('Jumlah baris data melebihi batas maksimal 100 baris.');
         $service->pratinjau($berkas);
     }
 
@@ -122,15 +122,17 @@ class Langkah14FiturLengkapTest extends TestCase
 
         $baris = [
             ['nama_lengkap', 'username', 'email', 'kelas'],
-            // 1. Valid biasa dengan rumus di kolom kelas (rumus TIDAK boleh dievaluasi)
-            ['Citra Kirana', 'citra_k', 'citra@siswa.test', '=SUM(1,2)'],
-            // 2. Duplikat username di sistem (ahmad_siswa)
+            // 1. Baris valid normal
+            ['Budi Raharjo', 'budi_raharjo', 'budi@siswa.test', 'XI MIPA 1'],
+            // 2. Berisi rumus di kolom nama / kelas -> wajib ditolak dengan alasan 'rumus tidak diizinkan'
+            ['=SUM(1,2)', 'citra_k', 'citra@siswa.test', 'XI'],
+            // 3. Duplikat username di sistem (ahmad_siswa)
             ['Ahmad Duplikat', 'ahmad_siswa', 'ahmad2@siswa.test', 'XI'],
-            // 3. Duplikat email di sistem (ahmad@siswa.test)
+            // 4. Duplikat email di sistem (ahmad@siswa.test)
             ['Siswa Email Sama', 'siswa_email_sama', 'ahmad@siswa.test', 'XI'],
-            // 4. Duplikat di dalam berkas itu sendiri
-            ['Citra Kembar', 'citra_k', 'citra_kembar@siswa.test', 'XI'],
-            // 5. Data kosong / invalid
+            // 5. Duplikat di dalam berkas itu sendiri
+            ['Budi Kembar', 'budi_raharjo', 'budi_kembar@siswa.test', 'XI'],
+            // 6. Data kosong / invalid
             ['', 'tanpa_nama', 'salah_email', 'XI'],
         ];
 
@@ -138,12 +140,20 @@ class Langkah14FiturLengkapTest extends TestCase
         $hasil = $service->pratinjau($berkas);
 
         // Belum ada user baru tersimpan
-        $this->assertDatabaseMissing('users', ['username' => 'citra_k']);
+        $this->assertDatabaseMissing('users', ['username' => 'budi_raharjo']);
         $this->assertCount(1, $hasil['baris_valid']);
-        $this->assertCount(4, $hasil['baris_galat']);
+        $this->assertCount(5, $hasil['baris_galat']);
 
-        // Nilai rumus di baris valid tetap dibaca sebagai teks mentah =SUM(1,2), bukan angka 3
-        $this->assertSame('=SUM(1,2)', $hasil['baris_valid'][0]['kelas']);
+        // Verifikasi baris rumus ditolak dengan alasan jelas
+        $alasanGalatRumus = array_column($hasil['baris_galat'], 'alasan');
+        $ditemukanPesanRumus = false;
+        foreach ($alasanGalatRumus as $alasan) {
+            if (str_contains($alasan, 'rumus tidak diizinkan')) {
+                $ditemukanPesanRumus = true;
+                break;
+            }
+        }
+        $this->assertTrue($ditemukanPesanRumus, "Harus terdapat pesan 'rumus tidak diizinkan' pada baris berrumus.");
     }
 
     public function test_konfirmasi_impor_siswa_atomik_dan_menulis_riwayat_tindakan_admin(): void
@@ -204,6 +214,12 @@ class Langkah14FiturLengkapTest extends TestCase
 
         $response->assertOk();
         $response->assertHeader('content-disposition', 'attachment; filename=daftar_akun_siswa_sementara.xlsx');
+
+        // Pengunduhan kedua harus ditolak karena sesi sudah dihapus (sekali pakai)
+        $this->actingAs($this->admin)
+            ->get(route('admin.impor-siswa.unduh-akun'))
+            ->assertRedirect(route('admin.pengguna.index'))
+            ->assertSessionHas('galat');
     }
 
     // ==========================================
@@ -231,6 +247,8 @@ class Langkah14FiturLengkapTest extends TestCase
             ['pilihan_ganda', 'Organel protein?', 10, 'Ribosom', 'Lisosom', '', '', '', 'C', '', '', ''],
             // Salah: Isian tanpa kunci
             ['isian', 'Tempat DNA?', 10, '', '', '', '', '', '', '', '', ''],
+            // Salah: Soal mengandung rumus di pertanyaan atau pilihan -> wajib ditolak 'rumus tidak diizinkan'
+            ['pilihan_ganda', '=SUM(1,2)', 10, 'A', 'B', '', '', '', 'A', '', '', ''],
             // Valid Esai
             ['esai', 'Jelaskan respirasi?', 20, '', '', '', '', '', '', '', '', ''],
         ];
@@ -239,7 +257,18 @@ class Langkah14FiturLengkapTest extends TestCase
         $hasil = $service->pratinjau($berkas, $kuis);
 
         $this->assertCount(2, $hasil['baris_valid']);
-        $this->assertCount(2, $hasil['baris_galat']);
+        $this->assertCount(3, $hasil['baris_galat']);
+
+        // Verifikasi terdapat pesan 'rumus tidak diizinkan' pada baris berrumus
+        $alasanGalat = array_column($hasil['baris_galat'], 'alasan');
+        $adaPesanRumus = false;
+        foreach ($alasanGalat as $alasan) {
+            if (str_contains($alasan, 'rumus tidak diizinkan')) {
+                $adaPesanRumus = true;
+                break;
+            }
+        }
+        $this->assertTrue($adaPesanRumus, "Harus terdapat alasan 'rumus tidak diizinkan' pada impor soal.");
 
         // Konfirmasi gagal (atomik) bila baris galat tidak kosong
         $this->expectException(\InvalidArgumentException::class);
@@ -504,5 +533,98 @@ class Langkah14FiturLengkapTest extends TestCase
             'kunci' => 'kode_pendaftaran',
             'nilai_baru' => 'KODE_RAHASIA_123',
         ]);
+    }
+
+    public function test_otorisasi_ketat_rute_impor_dan_pratinjau_menolak_siswa_dan_tamu(): void
+    {
+        $bab = Bab::create(['judul' => 'Bab Uji Otorisasi', 'urutan' => 1, 'status_terbit' => true]);
+        $kuis = Kuis::create(['bab_id' => $bab->id, 'judul' => 'Kuis Uji', 'tipe_kuis' => 'kuis_bab']);
+
+        $ruteAdmin = [
+            route('admin.impor-siswa.create'),
+            route('admin.impor-siswa.templat'),
+            route('admin.impor-soal.create', $kuis),
+            route('admin.impor-soal.templat'),
+            route('admin.impor-siswa.unduh-akun'),
+            route('admin.pratinjau.bab', $bab),
+            route('admin.pratinjau.kuis', $kuis),
+        ];
+
+        foreach ($ruteAdmin as $url) {
+            // Tamu dialihkan ke login
+            $resTamu = $this->app['auth']->guard('web')->logout();
+            $this->flushSession();
+            $this->get($url)->assertRedirect(route('masuk'));
+
+            // Siswa ditolak 403 Forbidden
+            $this->actingAs($this->siswa)->get($url)->assertForbidden();
+        }
+    }
+
+    public function test_kata_sandi_sementara_hasil_impor_tidak_ada_di_basis_data_disk_dan_logs(): void
+    {
+        $service = app(ImporSiswaService::class);
+        $barisValid = [
+            [
+                'nomor_baris' => 2,
+                'nama_lengkap' => 'Siswa Audit Pass',
+                'username' => 'siswa_audit_pass',
+                'email' => 'audit_pass@siswa.test',
+                'kelas' => 'XI MIPA',
+            ],
+        ];
+
+        $hasilAkun = $service->konfirmasi($barisValid, $this->admin->id, 'siswa.xlsx');
+        $this->assertNotEmpty($hasilAkun);
+        $kataSandiSementara = $hasilAkun[0]['kata_sandi_sementara'];
+
+        // 1. Periksa tabel users: kata sandi adalah hash bcrypt valid, teks asli TIDAK ADA di kolom password
+        $user = User::where('username', 'siswa_audit_pass')->firstOrFail();
+        $this->assertNotSame($kataSandiSementara, $user->password);
+        $this->assertTrue(Hash::check($kataSandiSementara, $user->password));
+
+        // 2. Periksa disk storage/logs: kata sandi sementara tidak tertulis di berkas log mana pun
+        $logPath = storage_path('logs');
+        if (is_dir($logPath)) {
+            $berkasLogs = glob($logPath.'/*.log');
+            foreach ($berkasLogs as $berkasLog) {
+                $isiLog = file_get_contents($berkasLog);
+                $this->assertStringNotContainsString(
+                    $kataSandiSementara,
+                    $isiLog,
+                    "Kata sandi sementara tidak boleh bocor ke berkas log: {$berkasLog}"
+                );
+            }
+        }
+    }
+
+    public function test_impor_soal_menolak_berkas_lebih_dari_satu_mb_atau_bukan_xlsx_atau_lebih_dari_100_soal(): void
+    {
+        $bab = Bab::create(['judul' => 'Bab Batas Soal', 'urutan' => 1, 'status_terbit' => true]);
+        $kuis = Kuis::create(['bab_id' => $bab->id, 'judul' => 'Kuis Batas', 'tipe_kuis' => 'kuis_bab']);
+
+        // 1. Bukan XLSX
+        $fileTxt = UploadedFile::fake()->create('soal.txt', 10, 'text/plain');
+        $this->actingAs($this->admin)
+            ->post(route('admin.impor-soal.pratinjau', $kuis), ['berkas' => $fileTxt])
+            ->assertSessionHasErrors('berkas');
+
+        // 2. Lebih dari 1 MB
+        $fileBesar = UploadedFile::fake()->create('soal_besar.xlsx', 1500, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->actingAs($this->admin)
+            ->post(route('admin.impor-soal.pratinjau', $kuis), ['berkas' => $fileBesar])
+            ->assertSessionHasErrors('berkas');
+
+        // 3. Lebih dari 100 soal
+        $service = app(ImporSoalService::class);
+        $baris = [['tipe', 'pertanyaan', 'bobot', 'pilihan_a', 'pilihan_b', 'pilihan_c', 'pilihan_d', 'pilihan_e', 'kunci', 'kunci_isian_1', 'kunci_isian_2', 'kunci_isian_3']];
+        for ($i = 1; $i <= 105; $i++) {
+            $baris[] = ['esai', "Soal {$i}", 10, '', '', '', '', '', '', '', '', ''];
+        }
+
+        $berkas105 = $this->buatBerkasXlsx($baris, '105_soal.xlsx');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Jumlah baris soal melebihi batas maksimal 100 baris.');
+        $service->pratinjau($berkas105, $kuis);
     }
 }
