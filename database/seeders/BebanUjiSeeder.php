@@ -22,8 +22,8 @@ class BebanUjiSeeder extends Seeder
      */
     public function run(): void
     {
-        if (app()->environment('production')) {
-            throw new \RuntimeException('BebanUjiSeeder DITOLAK: Seeder ini tidak boleh dijalankan di environment production!');
+        if (app()->environment('production') || config('app.env') === 'production') {
+            throw new \RuntimeException('BebanUjiSeeder tidak boleh dijalankan di lingkungan produksi.');
         }
 
         // 1. Buat 5 Bab Pembelajaran

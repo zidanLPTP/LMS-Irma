@@ -19,14 +19,14 @@ class MateriRequest extends FormRequest
 
         $validasiHeaderPdf = function (string $attribute, mixed $value, \Closure $fail) {
             if ($value instanceof UploadedFile && $value->isValid()) {
-                // Untuk file testing yang dibuat dengan create(), izinkan jika mime valid atau isi %PDF-
                 $realPath = $value->getRealPath();
-                if ($realPath && file_exists($realPath) && filesize($realPath) >= 5) {
+                if ($realPath && file_exists($realPath)) {
                     $handle = fopen($realPath, 'rb');
                     if ($handle) {
                         $header = fread($handle, 5);
                         fclose($handle);
-                        if ($header !== '%PDF-' && ! app()->environment('testing')) {
+                        // Jika berkas memiliki isi dan tanda awalnya bukan %PDF-, tolak!
+                        if ($header !== '%PDF-') {
                             $fail('Berkas yang diunggah bukan dokumen PDF yang valid (tanda awal berkas tidak sesuai).');
                         }
                     }

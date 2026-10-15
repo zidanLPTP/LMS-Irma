@@ -113,7 +113,7 @@ class AdminKontenTest extends TestCase
         $bab = Bab::create(['judul' => 'Bab 1', 'urutan' => 1, 'status_terbit' => true]);
 
         // Upload PDF valid & URL YouTube valid
-        $filePdf = UploadedFile::fake()->create('modul_sel.pdf', 1024, 'application/pdf');
+        $filePdf = UploadedFile::fake()->createWithContent('modul_sel.pdf', "%PDF-1.4\nKonten modul biologi sel");
         $resStore = $this->post(route('admin.bab.materi.store', $bab), [
             'judul' => 'Modul 1 Sel',
             'tipe' => 'pdf',
@@ -317,7 +317,7 @@ class AdminKontenTest extends TestCase
         $bab = Bab::create(['judul' => 'Bab PDF', 'urutan' => 1, 'status_terbit' => true]);
 
         // Upload berkas awal
-        $fileAwal = UploadedFile::fake()->create('modul_awal.pdf', 100, 'application/pdf');
+        $fileAwal = UploadedFile::fake()->createWithContent('modul_awal.pdf', "%PDF-1.4\nKonten awal");
         $this->post(route('admin.bab.materi.store', $bab), [
             'judul' => 'Materi PDF Awal',
             'tipe' => 'pdf',
@@ -329,7 +329,7 @@ class AdminKontenTest extends TestCase
         Storage::disk('local')->assertExists($pathAwal);
 
         // Ganti dengan berkas PDF baru -> berkas lama harus terhapus dari storage
-        $fileBaru = UploadedFile::fake()->create('modul_revisi.pdf', 120, 'application/pdf');
+        $fileBaru = UploadedFile::fake()->createWithContent('modul_revisi.pdf', "%PDF-1.4\nKonten revisi");
         $this->put(route('admin.bab.materi.update', [$bab, $materi]), [
             'judul' => 'Materi PDF Revisi',
             'tipe' => 'pdf',
