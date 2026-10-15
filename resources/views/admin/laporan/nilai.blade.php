@@ -88,7 +88,10 @@
                                     @php
                                         $percPre = $pretest ? $siswa->percobaanKuis->where('kuis_id', $pretest->id) : collect();
                                         $adaEsaiPre = $percPre->contains('esai_menunggu_nilai', true);
-                                        $nilaiPre = $pretest ? $penilaianService->ambilNilaiTertinggi($pretest, $siswa) : null;
+                                        $nilaiPre = null;
+                                        if ($percPre->isNotEmpty()) {
+                                            $nilaiPre = $percPre->map(fn ($p) => ! is_null($p->nilai_akhir) ? (float) $p->nilai_akhir : (! is_null($p->nilai_otomatis) ? (float) $p->nilai_otomatis : 0.00))->max();
+                                        }
                                     @endphp
                                     @if ($percPre->isEmpty())
                                         <span class="text-muted italic">{{ __('laporan.belum_dikerjakan') }}</span>
@@ -108,7 +111,10 @@
                                             @php
                                                 $percBab = $siswa->percobaanKuis->where('kuis_id', $bab->kuis->id);
                                                 $adaEsaiBab = $percBab->contains('esai_menunggu_nilai', true);
-                                                $nilaiBab = $penilaianService->ambilNilaiTertinggi($bab->kuis, $siswa);
+                                                $nilaiBab = null;
+                                                if ($percBab->isNotEmpty()) {
+                                                    $nilaiBab = $percBab->map(fn ($p) => ! is_null($p->nilai_akhir) ? (float) $p->nilai_akhir : (! is_null($p->nilai_otomatis) ? (float) $p->nilai_otomatis : 0.00))->max();
+                                                }
                                             @endphp
                                             @if ($percBab->isEmpty())
                                                 <span class="text-muted italic">{{ __('laporan.belum_dikerjakan') }}</span>
@@ -128,7 +134,10 @@
                                     @php
                                         $percPost = $posttest ? $siswa->percobaanKuis->where('kuis_id', $posttest->id) : collect();
                                         $adaEsaiPost = $percPost->contains('esai_menunggu_nilai', true);
-                                        $nilaiPost = $posttest ? $penilaianService->ambilNilaiTertinggi($posttest, $siswa) : null;
+                                        $nilaiPost = null;
+                                        if ($percPost->isNotEmpty()) {
+                                            $nilaiPost = $percPost->map(fn ($p) => ! is_null($p->nilai_akhir) ? (float) $p->nilai_akhir : (! is_null($p->nilai_otomatis) ? (float) $p->nilai_otomatis : 0.00))->max();
+                                        }
                                     @endphp
                                     @if ($percPost->isEmpty())
                                         <span class="text-muted italic">{{ __('laporan.belum_dikerjakan') }}</span>

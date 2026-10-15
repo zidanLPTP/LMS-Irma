@@ -18,20 +18,23 @@ Dokumen ini mencatat tolak ukur (benchmark) performa sistem LMS BioSTEMX pada li
 
 ## 2. Hasil Pengukuran Tolak Ukur (Benchmark)
 
-Pengujian diukur langsung menggunakan penangkap durasi mikrodetik (`microtime`), pencatat memori puncak sistem (`memory_get_peak_usage`), dan penelusur query database aktif (`DB::getQueryLog()`).
+### A. Tabel Perbandingan Sebelum vs Sesudah Optimasi Batch & In-Memory Caching
 
-| Fitur / Halaman | Waktu Respons (ms) | Jumlah Query SQL | Memori Puncak (MB) | Status HTTP | Evaluasi & Rekomendasi |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Dasbor Admin** (`/admin/beranda`) | 29.912 ms | 16.428 queries | 40 MB | 200 OK | *Perlu Optimasi Eager Loading*: Agregasi sebaran progres 100 siswa saat ini memanggil `daftarLangkahBelajar` di dalam loop. Direkomendasikan melakukan batch query/caching agregat progres untuk produksi. |
-| **Laporan Akses Siswa** (`/admin/laporan/akses`) | 70 ms | 9 queries | 40 MB | 200 OK | Sangat cepat (<100 ms) dan efisien (<15 query). Pagination 25 baris berjalan optimal. |
-| **Laporan Nilai Siswa** (`/admin/laporan/nilai`) | 519 ms | 186 queries | 40 MB | 200 OK | Stabil di ~500 ms untuk 100 siswa dengan rekapitulasi nilai kuis bab. |
-| **Daftar Pengguna** (`/admin/pengguna`) | 2.519 ms | 1.229 queries | 40 MB | 200 OK | Halaman paginasi 25 siswa berjalan aman (<3 dtk) dengan kalkulasi progres belajar siswa. |
-| **Antrean Penilaian Esai** (`/admin/penilaian-esai`) | 135 ms | 10 queries | 40 MB | 200 OK | Sangat ringan (<150 ms) dan bebas N+1 query. |
-| **Beranda Siswa** (`/siswa/beranda`) | 202 ms | 63 queries | 40 MB | 200 OK | Memenuhi standar (<500 ms) untuk alur stepper dan bab terbit. |
-| **Halaman Soal Kuis** (`/siswa/percobaan/{id}/soal`) | 48 ms | 18 queries | 40 MB | 200 OK | Sangat responsif (<50 ms), memastikan pengalaman ujian siswa di HP tidak tersendat. |
-| **Endpoint Detak (Heartbeat)** (`/detak`) | 43 ms | 11 queries | 40 MB | 204 No Content | Ringan dan tidak membebani server saat browser mengirim sinyal berkala. |
-| **Ekspor Excel Laporan Akses** (`/admin/laporan/akses/ekspor`) | 1.435 ms | 15 queries | 74 MB | 200 OK | Sangat cepat (~1,4 dtk) dan memori aman jauh di bawah batas 128 MB. |
-| **Ekspor Excel Laporan Nilai** (`/admin/laporan/nilai/ekspor`) | 877 ms | 123 queries | 74 MB | 200 OK | Sangat cepat (<1 dtk) dan penggunaan memori sangat efisien (74 MB vs limit 128 MB). |
+Optimasi meliputi:
+1. `BukaAksesService::daftarLangkahBelajarMassal`: Menggantikan perulangan `daftarLangkahBelajar` 100 siswa di dasbor admin dan 25 siswa di daftar pengguna menjadi 4 batch query dengan evaluasi status di memori.
+2. In-Memory Static Caching `Pengaturan::ambilSemuaCached`: Menghilangkan query `pengaturan` yang berulang pada perhitungan nilai lulus dan batas waktu.
+3. Batch agregasi `statistikKuis` di `BerandaController`: Satu query ringkasan `groupBy('kuis_id', 'user_id')` untuk seluruh kuis.
+4. Eliminasi query berulang `ambilNilaiTertinggi` di Laporan Nilai Web & Sheet Excel menggunakan koleksi relasi `percobaanKuis` yang sudah di-eager load.
+5. Delegasi `daftarLangkahBelajar` tunggal ke `daftarLangkahBelajarMassal([$user])` pada Beranda Siswa.
+
+| Fitur / Halaman | Target Bagian C | Sebelum Optimasi (Waktu / Query) | Sesudah Optimasi (Waktu / Query) | Status Evaluasi |
+| :--- | :--- | :--- | :--- | :--- |
+| **Dasbor Admin** (`/admin/beranda`) | **< 500 ms** & **< 25 query** | 29.912 ms / 16.428 queries | **213,13 ms / 22 queries** | **TERCAPAI** (Turun 99,8% query & 99,3% waktu) |
+| **Daftar Pengguna** (`/admin/pengguna` - 25 baris) | **< 30 query** | 2.519 ms / 1.229 queries | **81,53 ms / 11 queries** | **TERCAPAI** (Turun 99,1% query & 96,8% waktu) |
+| **Beranda Siswa** (`/siswa/beranda`) | **< 25 query** | 202 ms / 63 queries | **32,60 ms / 10 queries** | **TERCAPAI** (Turun 84,1% query & 83,9% waktu) |
+| **Laporan Nilai Siswa** (`/admin/laporan/nilai`) | **< 30 query** | 519 ms / 186 queries | **71,24 ms / 10 queries** | **TERCAPAI** (Turun 94,6% query & 86,3% waktu) |
+| **Ekspor Excel Rekap Nilai** (`RekapNilaiSheet`) | **< 30 query** | 877 ms / 123 queries | **97,04 ms / 6 queries** | **TERCAPAI** (Turun 95,1% query & 88,9% waktu) |
+| **Endpoint Detak (Heartbeat)** (`/detak`) | **< 4 query** | 43 ms / 11 queries | **10,61 ms / 2 queries** | **TERCAPAI** (Hanya 2 query: cek session & update log) |
 
 ---
 

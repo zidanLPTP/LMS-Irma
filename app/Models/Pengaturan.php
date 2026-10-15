@@ -14,6 +14,13 @@ class Pengaturan extends Model
     ];
 
     /**
+     * Cache in-memory lokal per request (menghindari query ganda dalam 1 request).
+     *
+     * @var array<string, mixed>|null
+     */
+    protected static ?array $cacheSemuaPengaturan = null;
+
+    /**
      * Ambil nilai pengaturan berdasarkan kunci dengan nilai bawaan.
      */
     public static function ambil(string $kunci, mixed $bawaan = null): mixed
@@ -32,5 +39,13 @@ class Pengaturan extends Model
             ['kunci' => $kunci],
             ['nilai' => (string) $nilai]
         );
+    }
+
+    /**
+     * Bersihkan cache in-memory untuk testing / pergantian sesi.
+     */
+    public static function bersihkanCache(): void
+    {
+        static::$cacheSemuaPengaturan = null;
     }
 }

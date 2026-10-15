@@ -125,7 +125,7 @@ class RekapNilaiSheet extends AmanValueBinder implements FromQuery, WithChunkRea
 
         // Cek apakah ada esai yang masih menunggu penilaian
         $adaEsaiMenunggu = $percobaanSiswa->contains('esai_menunggu_nilai', true);
-        $nilaiTertinggi = $this->penilaianService->ambilNilaiTertinggi($kuis, $siswa);
+        $nilaiTertinggi = $percobaanSiswa->map(fn ($p) => ! is_null($p->nilai_akhir) ? (float) $p->nilai_akhir : (! is_null($p->nilai_otomatis) ? (float) $p->nilai_otomatis : 0.00))->max();
 
         if ($adaEsaiMenunggu) {
             $data[] = $nilaiTertinggi !== null ? (float) $nilaiTertinggi : '-';

@@ -600,4 +600,69 @@ class LogikaIntiTest extends TestCase
         $this->pelacakService->catatKeluar($admin);
         $this->assertDatabaseMissing('log_akses', ['user_id' => $admin->id]);
     }
+
+    public function test_kesetaraan_hasil_daftar_langkah_belajar_massal_dan_tunggal(): void
+    {
+        $siswa1 = User::factory()->create(['peran' => 'siswa']);
+        $siswa2 = User::factory()->create(['peran' => 'siswa']);
+
+        $pretest = Kuis::create([
+            'tipe_kuis' => 'pretest',
+            'judul' => 'Pretest Biologi',
+        ]);
+        $bab1 = Bab::create([
+            'judul' => 'Bab 1 Biologi Sel',
+            'status_terbit' => true,
+            'urutan' => 1,
+        ]);
+        $kuisBab1 = Kuis::create([
+            'tipe_kuis' => 'kuis_bab',
+            'bab_id' => $bab1->id,
+            'judul' => 'Kuis Bab 1',
+        ]);
+        $soalPG = Soal::create([
+            'kuis_id' => $kuisBab1->id,
+            'tipe_soal' => 'pilihan_ganda',
+            'pertanyaan' => 'Pertanyaan PG',
+            'bobot_poin' => 10,
+        ]);
+
+        // Siswa 1 selesai pretest
+        PercobaanKuis::create([
+            'user_id' => $siswa1->id,
+            'kuis_id' => $pretest->id,
+            'nomor_percobaan' => 1,
+            'status_pengerjaan' => 'selesai',
+            'dibatalkan' => false,
+            'status_kelulusan' => null,
+            'nilai_akhir' => 80,
+            'urutan_soal_teracak' => [],
+            'waktu_mulai' => now(),
+            'waktu_selesai' => now(),
+        ]);
+
+        // Hitung tunggal
+        $tunggal1 = $this->bukaAksesService->daftarLangkahBelajar($siswa1);
+        $tunggal2 = $this->bukaAksesService->daftarLangkahBelajar($siswa2);
+
+        // Hitung massal
+        $massal = $this->bukaAksesService->daftarLangkahBelajarMassal(collect([$siswa1, $siswa2]));
+
+        $this->assertCount(count($tunggal1), $massal[$siswa1->id]);
+        $this->assertCount(count($tunggal2), $massal[$siswa2->id]);
+
+        foreach ($tunggal1 as $i => $itemTunggal) {
+            $itemMassal = $massal[$siswa1->id][$i];
+            $this->assertEquals($itemTunggal['tipe'], $itemMassal['tipe']);
+            $this->assertEquals($itemTunggal['status'], $itemMassal['status']);
+            $this->assertEquals($itemTunggal['judul'], $itemMassal['judul']);
+        }
+
+        foreach ($tunggal2 as $i => $itemTunggal) {
+            $itemMassal = $massal[$siswa2->id][$i];
+            $this->assertEquals($itemTunggal['tipe'], $itemMassal['tipe']);
+            $this->assertEquals($itemTunggal['status'], $itemMassal['status']);
+            $this->assertEquals($itemTunggal['judul'], $itemMassal['judul']);
+        }
+    }
 }

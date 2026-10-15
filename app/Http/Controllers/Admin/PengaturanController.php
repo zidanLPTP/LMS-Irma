@@ -93,6 +93,7 @@ class PengaturanController extends Controller
         if ($baris) {
             if ($nilaiLama !== $nilaiDisimpan) {
                 $baris->update(['nilai' => $nilaiDisimpan]);
+                Pengaturan::setel($kunci, $nilaiDisimpan);
                 RiwayatPengaturan::create([
                     'kunci' => $kunci,
                     'nilai_lama' => $nilaiLama,
@@ -101,10 +102,7 @@ class PengaturanController extends Controller
                 ]);
             }
         } else {
-            Pengaturan::create([
-                'kunci' => $kunci,
-                'nilai' => $nilaiDisimpan,
-            ]);
+            Pengaturan::setel($kunci, $nilaiDisimpan);
             RiwayatPengaturan::create([
                 'kunci' => $kunci,
                 'nilai_lama' => null,

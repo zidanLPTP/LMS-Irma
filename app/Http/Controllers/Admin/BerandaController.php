@@ -63,21 +63,22 @@ class BerandaController extends Controller
             $daftarKuis->push($posttest);
         }
 
-        $statistikKuis = $daftarKuis->map(function (Kuis $kuis) {
-            // Ambil percobaan selesai & tidak dibatalkan yang memiliki nilai akhir sah (tidak null)
-            // Nilai tertinggi per siswa
-            $nilaiTertinggiPerSiswa = PercobaanKuis::select('user_id', DB::raw('MAX(nilai_akhir) as max_nilai'))
-                ->where('kuis_id', $kuis->id)
-                ->where('status_pengerjaan', 'selesai')
-                ->where('dibatalkan', false)
-                ->whereNotNull('nilai_akhir')
-                ->whereHas('user', fn ($q) => $q->where('peran', 'siswa'))
-                ->groupBy('user_id')
-                ->get();
+        $kuisIds = $daftarKuis->pluck('id')->filter()->all();
+        $semuaNilaiTertinggi = empty($kuisIds) ? collect() : PercobaanKuis::select('kuis_id', 'user_id', DB::raw('MAX(nilai_akhir) as max_nilai'))
+            ->whereIn('kuis_id', $kuisIds)
+            ->where('status_pengerjaan', 'selesai')
+            ->where('dibatalkan', false)
+            ->whereNotNull('nilai_akhir')
+            ->whereHas('user', fn ($q) => $q->where('peran', 'siswa'))
+            ->groupBy('kuis_id', 'user_id')
+            ->get()
+            ->groupBy('kuis_id');
 
-            $jumlahSiswaSelesai = $nilaiTertinggiPerSiswa->count();
+        $statistikKuis = $daftarKuis->map(function (Kuis $kuis) use ($semuaNilaiTertinggi) {
+            $nilaiPerSiswa = $semuaNilaiTertinggi->get($kuis->id, collect());
+            $jumlahSiswaSelesai = $nilaiPerSiswa->count();
             $rataRataNilai = $jumlahSiswaSelesai > 0
-                ? round($nilaiTertinggiPerSiswa->avg('max_nilai'), 1)
+                ? round($nilaiPerSiswa->avg('max_nilai'), 1)
                 : null;
 
             return [
@@ -111,8 +112,10 @@ class BerandaController extends Controller
             $sebaranProgres[$kat] = 0;
         }
 
+        $daftarLangkahSemua = $bukaAksesService->daftarLangkahBelajarMassal($semuaSiswaAktif);
+
         foreach ($semuaSiswaAktif as $siswa) {
-            $langkahSiswa = $bukaAksesService->daftarLangkahBelajar($siswa);
+            $langkahSiswa = $daftarLangkahSemua[$siswa->id] ?? [];
             $semuaSelesai = true;
             $langkahAktifNama = 'Belum Mulai';
 

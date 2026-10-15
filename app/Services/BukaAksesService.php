@@ -7,6 +7,7 @@ use App\Models\Kuis;
 use App\Models\PercobaanKuis;
 use App\Models\ProgresMateri;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class BukaAksesService
 {
@@ -148,68 +149,9 @@ class BukaAksesService
      */
     public function daftarLangkahBelajar(User $user): array
     {
-        $langkah = [];
+        $hasilMassal = $this->daftarLangkahBelajarMassal([$user]);
 
-        // 1. Pretest
-        $pretest = Kuis::where('tipe_kuis', 'pretest')->first();
-        if ($pretest) {
-            $selesai = $this->apakahPretestSelesai($user);
-            $langkah[] = [
-                'tipe' => 'pretest',
-                'judul' => $pretest->judul,
-                'model' => $pretest,
-                'status' => $selesai ? 'selesai' : 'terbuka',
-            ];
-        }
-
-        // 2. Bab-bab terbit dinamis
-        $babTerbit = Bab::where('status_terbit', true)->orderBy('urutan')->get();
-        foreach ($babTerbit as $bab) {
-            $selesai = $this->apakahBabSelesai($bab, $user);
-            $terbuka = $this->apakahBabTerbuka($bab, $user);
-
-            $status = 'terkunci';
-            if ($selesai) {
-                $status = 'selesai';
-            } elseif ($terbuka) {
-                $status = 'terbuka';
-            }
-
-            $langkah[] = [
-                'tipe' => 'bab',
-                'judul' => $bab->judul,
-                'model' => $bab,
-                'status' => $status,
-            ];
-        }
-
-        // 3. Posttest
-        $posttest = Kuis::where('tipe_kuis', 'posttest')->first();
-        if ($posttest) {
-            $selesai = PercobaanKuis::where('kuis_id', $posttest->id)
-                ->where('user_id', $user->id)
-                ->where('dibatalkan', false)
-                ->where('status_pengerjaan', 'selesai')
-                ->exists();
-
-            $terbuka = $this->apakahKuisTerbuka($posttest, $user);
-
-            $status = 'terkunci';
-            if ($selesai) {
-                $status = 'selesai';
-            } elseif ($terbuka) {
-                $status = 'terbuka';
-            }
-
-            $langkah[] = [
-                'tipe' => 'posttest',
-                'judul' => $posttest->judul,
-                'model' => $posttest,
-                'status' => $status,
-            ];
-        }
-
-        return $langkah;
+        return $hasilMassal[$user->id] ?? [];
     }
 
     /**
@@ -227,5 +169,168 @@ class BukaAksesService
             ->where('dibatalkan', false)
             ->where('status_pengerjaan', 'selesai')
             ->exists();
+    }
+
+    /**
+     * Hitung langkah belajar untuk banyak siswa sekaligus secara massal (Batch Eager Loading).
+     * Mencegah N+1 query: mengambil bab, kuis, soal, percobaan kuis, dan progres materi
+     * hanya dalam 4-5 query, lalu mengevaluasi stepper di memori dengan logika yang PERSIS SAMA.
+     *
+     * @param  Collection|array  $koleksiUser
+     * @return array<int, array> [user_id => [langkah_belajar...]]
+     */
+    public function daftarLangkahBelajarMassal(mixed $koleksiUser): array
+    {
+        $userIds = collect($koleksiUser)->pluck('id')->filter()->unique()->values()->all();
+        if (empty($userIds)) {
+            return [];
+        }
+
+        // 1. Ambil kuis & bab terbit beserta relasi soal & materi
+        $pretest = Kuis::where('tipe_kuis', 'pretest')->first();
+        $posttest = Kuis::where('tipe_kuis', 'posttest')->first();
+        $babTerbit = Bab::where('status_terbit', true)
+            ->orderBy('urutan')
+            ->with(['kuis.soal', 'materi'])
+            ->get();
+
+        // 2. Ambil seluruh percobaan kuis selesai & tidak dibatalkan milik kumpulan siswa ini
+        $semuaKuisIds = collect();
+        if ($pretest) {
+            $semuaKuisIds->push($pretest->id);
+        }
+        if ($posttest) {
+            $semuaKuisIds->push($posttest->id);
+        }
+        foreach ($babTerbit as $b) {
+            if ($b->kuis) {
+                $semuaKuisIds->push($b->kuis->id);
+            }
+        }
+
+        $percobaanGroup = PercobaanKuis::whereIn('user_id', $userIds)
+            ->whereIn('kuis_id', $semuaKuisIds->unique())
+            ->where('dibatalkan', false)
+            ->where('status_pengerjaan', 'selesai')
+            ->get()
+            ->groupBy('user_id');
+
+        // 3. Ambil seluruh progres materi dibuka milik kumpulan siswa ini
+        $semuaMateriIds = $babTerbit->flatMap(fn ($b) => $b->materi->pluck('id'))->unique()->values()->all();
+        $progresGroup = ! empty($semuaMateriIds)
+            ? ProgresMateri::whereIn('user_id', $userIds)
+                ->whereIn('materi_id', $semuaMateriIds)
+                ->where('sudah_dibuka', true)
+                ->get()
+                ->groupBy('user_id')
+            : collect();
+
+        // 4. Hitung di memori untuk tiap siswa
+        $hasilSemua = [];
+        foreach ($userIds as $uid) {
+            $percobaanSiswa = $percobaanGroup->get($uid, collect());
+            $progresSiswa = $progresGroup->get($uid, collect());
+
+            // Helper cek pretest selesai di memori
+            $pretestSelesai = true;
+            if ($pretest) {
+                $pretestSelesai = $percobaanSiswa->contains(fn ($p) => (int) $p->kuis_id === (int) $pretest->id);
+            }
+
+            // Helper cek bab selesai di memori
+            $fnBabSelesai = function (Bab $bab) use ($percobaanSiswa, $progresSiswa): bool {
+                $kuis = $bab->kuis;
+                if ($kuis) {
+                    $soalOtomatisAda = $kuis->soal->contains(fn ($s) => in_array($s->tipe_soal, ['pilihan_ganda', 'isian'], true));
+                    if ($soalOtomatisAda) {
+                        return $percobaanSiswa->contains(fn ($p) => (int) $p->kuis_id === (int) $kuis->id &&
+                            in_array($p->status_kelulusan, ['lulus', 'belum_lulus_lanjut'], true)
+                        );
+                    }
+
+                    $soalEsaiAda = $kuis->soal->contains(fn ($s) => $s->tipe_soal === 'esai');
+                    if ($soalEsaiAda) {
+                        return $percobaanSiswa->contains(fn ($p) => (int) $p->kuis_id === (int) $kuis->id);
+                    }
+                }
+
+                $materiIds = $bab->materi->pluck('id');
+                if ($materiIds->isEmpty()) {
+                    return true;
+                }
+                $dibukaCount = $progresSiswa->whereIn('materi_id', $materiIds)->count();
+
+                return $dibukaCount >= $materiIds->count();
+            };
+
+            $langkah = [];
+
+            // A. Pretest
+            if ($pretest) {
+                $langkah[] = [
+                    'tipe' => 'pretest',
+                    'judul' => $pretest->judul,
+                    'model' => $pretest,
+                    'status' => $pretestSelesai ? 'selesai' : 'terbuka',
+                ];
+            }
+
+            // B. Bab-bab terbit
+            $babSebelumnyaSelesai = $pretestSelesai;
+            foreach ($babTerbit as $idx => $bab) {
+                $selesai = $fnBabSelesai($bab);
+                $terbuka = $babSebelumnyaSelesai;
+
+                $status = 'terkunci';
+                if ($selesai) {
+                    $status = 'selesai';
+                } elseif ($terbuka) {
+                    $status = 'terbuka';
+                }
+
+                $langkah[] = [
+                    'tipe' => 'bab',
+                    'judul' => $bab->judul,
+                    'model' => $bab,
+                    'status' => $status,
+                ];
+
+                $babSebelumnyaSelesai = $selesai;
+            }
+
+            // C. Posttest
+            if ($posttest) {
+                $selesai = $percobaanSiswa->contains(fn ($p) => (int) $p->kuis_id === (int) $posttest->id);
+                $babTerakhir = $babTerbit->last();
+                $terbuka = false;
+                if ($selesai) {
+                    $terbuka = false; // Jika selesai, kuis tertutup
+                } else {
+                    if ($babTerakhir) {
+                        $terbuka = $fnBabSelesai($babTerakhir);
+                    } else {
+                        $terbuka = $pretestSelesai;
+                    }
+                }
+
+                $status = 'terkunci';
+                if ($selesai) {
+                    $status = 'selesai';
+                } elseif ($terbuka) {
+                    $status = 'terbuka';
+                }
+
+                $langkah[] = [
+                    'tipe' => 'posttest',
+                    'judul' => $posttest->judul,
+                    'model' => $posttest,
+                    'status' => $status,
+                ];
+            }
+
+            $hasilSemua[$uid] = $langkah;
+        }
+
+        return $hasilSemua;
     }
 }

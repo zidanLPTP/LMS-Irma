@@ -59,9 +59,12 @@ class PenggunaController extends Controller
 
         $daftarSiswa = $query->paginate(25)->withQueryString();
 
-        // Hitung progres singkat untuk tiap siswa di halaman aktif
-        $daftarSiswa->getCollection()->transform(function ($siswa) {
-            $langkah = $this->bukaAksesService->daftarLangkahBelajar($siswa);
+        // Hitung progres singkat untuk tiap siswa di halaman aktif secara massal
+        $koleksiSiswa = $daftarSiswa->getCollection();
+        $daftarLangkahSemua = $this->bukaAksesService->daftarLangkahBelajarMassal($koleksiSiswa);
+
+        $koleksiSiswa->transform(function ($siswa) use ($daftarLangkahSemua) {
+            $langkah = $daftarLangkahSemua[$siswa->id] ?? [];
             $totalLangkah = count($langkah);
             $selesaiLangkah = count(array_filter($langkah, fn ($l) => $l['status'] === 'selesai'));
 
