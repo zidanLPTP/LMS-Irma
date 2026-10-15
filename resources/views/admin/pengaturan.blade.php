@@ -40,7 +40,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-ink mb-1">
+                    <label for="logo" class="block text-sm font-bold text-ink mb-1">
                         {{ __('pengaturan.logo_situs') }}
                     </label>
                     <p class="text-xs text-muted mb-3">{{ __('pengaturan.logo_keterangan') }}</p>
@@ -52,7 +52,7 @@
                         </div>
                     @endif
 
-                    <input type="file" id="logo" name="logo" accept=".png,.jpg,.jpeg,.webp"
+                    <input type="file" id="logo" name="logo" accept=".png,.jpg,.jpeg,.webp" aria-label="{{ __('pengaturan.logo_situs') }}"
                         class="block w-full text-sm text-ink file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-extrabold file:bg-green-100 file:text-green-800 hover:file:bg-green-200 cursor-pointer">
                 </div>
             </x-kartu>

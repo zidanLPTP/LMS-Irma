@@ -76,9 +76,9 @@ class MasukController extends Controller
         // Titik pencatatan log sesi masuk siswa
         $pelacakAkses->catatMasuk($user);
 
-        // Arahkan sesuai peran pengguna
+        // Arahkan sesuai peran pengguna (admin selalu ke beranda admin agar tidak terpengaruh riwayat sesi siswa)
         if ($user->isAdmin()) {
-            return redirect()->intended(route('admin.beranda'));
+            return redirect()->route('admin.beranda');
         }
 
         return redirect()->intended(route('siswa.beranda'));

@@ -32,8 +32,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-muted mb-1">{{ __('laporan.kelas') }}</label>
-                    <select name="kelas" class="w-full text-xs rounded-xl border border-border px-3 py-2 text-ink bg-white focus:outline-none focus:ring-2 focus:ring-green-700">
+                    <label for="filter_kelas" class="block text-xs font-bold text-muted mb-1">{{ __('laporan.kelas') }}</label>
+                    <select id="filter_kelas" name="kelas" aria-label="{{ __('laporan.kelas') }}" class="w-full text-xs rounded-xl border border-border px-3 py-2 text-ink bg-white focus:outline-none focus:ring-2 focus:ring-green-700">
                         <option value="">{{ __('laporan.filter_kelas') }}</option>
                         @foreach ($daftarKelas as $kls)
                             <option value="{{ $kls }}" {{ $kelasTerpilih === $kls ? 'selected' : '' }}>

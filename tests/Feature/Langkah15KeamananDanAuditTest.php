@@ -7,7 +7,9 @@ use App\Models\Kuis;
 use App\Models\Materi;
 use App\Models\Notifikasi;
 use App\Models\Pengaturan;
+use App\Models\Pengumuman;
 use App\Models\PercobaanKuis;
+use App\Models\Soal;
 use App\Models\User;
 use Database\Seeders\AdminSeeder;
 use Database\Seeders\BebanUjiSeeder;
@@ -141,7 +143,7 @@ class Langkah15KeamananDanAuditTest extends TestCase
     {
         $bab = Bab::create(['judul' => 'Bab IDOR Test', 'urutan' => 1, 'status_terbit' => true]);
         $kuis = Kuis::create(['bab_id' => $bab->id, 'judul' => 'Kuis IDOR', 'tipe_kuis' => 'kuis_bab']);
-        \App\Models\Soal::create([
+        Soal::create([
             'kuis_id' => $kuis->id,
             'tipe_soal' => 'pilihan_ganda',
             'pertanyaan' => 'Soal Syarat Bab 1',
@@ -207,7 +209,7 @@ class Langkah15KeamananDanAuditTest extends TestCase
             ->assertSessionHas('galat');
 
         // 5. Pengumuman: Siswa tidak bisa membaca pengumuman berstatus draf
-        $pengumumanDraf = \App\Models\Pengumuman::create([
+        $pengumumanDraf = Pengumuman::create([
             'judul' => 'Pengumuman Draf Rahasia',
             'isi' => 'Belum boleh dibaca siapapun',
             'status' => 'draf',
@@ -309,7 +311,7 @@ class Langkah15KeamananDanAuditTest extends TestCase
         $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
         $this->assertNotEmpty($response->headers->get('Permissions-Policy'));
-        
+
         $csp = $response->headers->get('Content-Security-Policy-Report-Only');
         $this->assertNotEmpty($csp);
         $this->assertStringNotContainsString("'unsafe-inline'", (string) preg_replace('/style-src[^;]+;/', '', $csp), "script-src CSP tidak boleh memuat 'unsafe-inline'!");
