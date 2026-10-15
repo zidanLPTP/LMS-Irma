@@ -51,6 +51,20 @@ Berikut adalah daftar atribut `$fillable` pada setiap model Eloquent dalam siste
   - `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net`
   - *Catatan Alpine.js:* Alpine.js versi standar memerlukan evaluasi ekspresi reaktif (`unsafe-eval`). Karena LMS tidak mengizinkan masukan HTML bebas dari siswa tanpa escaping, risiko injeksi DOM diminimalkan.
 
+### Hasil Pemindaian Browser Otomatis (Playwright CSP Scan)
+Pengujian E2E dijalankan melalui `tests/e2e/csp-audit.spec.js` pada dua resolusi standar (HP 375x667 dan Laptop 1280x800) untuk seluruh halaman utama admin dan siswa:
+- Halaman Masuk (`/masuk`)
+- Dasbor Admin (`/admin/beranda`)
+- Laporan Nilai Admin (`/admin/laporan/nilai`)
+- Beranda Siswa (`/siswa/beranda`)
+- Nilai Saya Siswa (`/siswa/nilai-saya`)
+- Profil Siswa (`/siswa/profil`)
+
+**Hasil Pengujian:**
+- Total Pelanggaran CSP Resolusi HP (375x667): **0 pelanggaran** (Lolos 100%)
+- Total Pelanggaran CSP Resolusi Laptop (1280x800): **0 pelanggaran** (Lolos 100%)
+- Semua aset skrip Alpine.js, Tailwind, ikon Lucide, dan stylesheet ter-load sempurna tanpa pelanggaran console CSP.
+
 ---
 
 ## 4. Perlindungan Unggahan Berkas (PDF & Excel)
