@@ -18,7 +18,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/detak-jantung.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="h-full font-sans text-ink antialiased bg-bg flex flex-col"
     data-url-detak="{{ route('siswa.detak') }}"
@@ -103,7 +102,7 @@
                     </span>
                 </div>
 
-                <form method="POST" action="{{ route('keluar') }}" class="inline" onsubmit="try { Object.keys(localStorage).forEach(k => { if (k.startsWith('draf_esai_')) localStorage.removeItem(k); }); } catch (e) {}">
+                <form method="POST" action="{{ route('keluar') }}" class="inline">
                     @csrf
                     <x-tombol tipe="garis" class="!min-h-[34px] sm:!min-h-[38px] !px-2.5 sm:!px-3.5 !py-1 text-xs font-bold">
                         Keluar

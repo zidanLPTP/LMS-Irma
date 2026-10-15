@@ -141,6 +141,12 @@ class Langkah15KeamananDanAuditTest extends TestCase
     {
         $bab = Bab::create(['judul' => 'Bab IDOR Test', 'urutan' => 1, 'status_terbit' => true]);
         $kuis = Kuis::create(['bab_id' => $bab->id, 'judul' => 'Kuis IDOR', 'tipe_kuis' => 'kuis_bab']);
+        \App\Models\Soal::create([
+            'kuis_id' => $kuis->id,
+            'tipe_soal' => 'pilihan_ganda',
+            'pertanyaan' => 'Soal Syarat Bab 1',
+            'bobot_poin' => 10,
+        ]);
 
         // 1. Percobaan Kuis: Siswa A mencoba membuka hasil percobaan Siswa B
         $percobaanB = PercobaanKuis::create([
@@ -172,12 +178,51 @@ class Langkah15KeamananDanAuditTest extends TestCase
             ->get(route('siswa.notifikasi.buka', $notifB))
             ->assertForbidden();
 
-        // 3. Siswa A menebak URL admin pengguna milik Siswa B
+        // 3. Bab & Materi: Siswa A mencoba membuka Bab 2 yang masih terkunci
+        $babTerkunci = Bab::create(['judul' => 'Bab Terkunci Siswa A', 'urutan' => 2, 'status_terbit' => true]);
+        $materiBabTerkunci = Materi::create([
+            'bab_id' => $babTerkunci->id,
+            'judul' => 'Materi Terkunci',
+            'tipe' => 'youtube',
+            'url_youtube' => 'https://www.youtube-nocookie.com/embed/dummy',
+            'urutan' => 1,
+        ]);
+        $this->actingAs($this->siswaA)
+            ->get(route('siswa.bab.show', $babTerkunci))
+            ->assertRedirect(route('siswa.beranda'));
+        $this->actingAs($this->siswaA)
+            ->get(route('siswa.bab.materi.show', [$babTerkunci, $materiBabTerkunci]))
+            ->assertRedirect(route('siswa.beranda'));
+
+        // IDOR Materi Salah Bab (Materi Bab 2 dipanggil pada URL Bab 1)
+        $this->actingAs($this->siswaA)
+            ->get(route('siswa.bab.materi.show', [$bab, $materiBabTerkunci]))
+            ->assertNotFound();
+
+        // 4. Kuis Terkunci: Siswa A mencoba memulai percobaan pada kuis bab terkunci
+        $kuisTerkunci = Kuis::create(['bab_id' => $babTerkunci->id, 'judul' => 'Kuis Bab Terkunci', 'tipe_kuis' => 'kuis_bab']);
+        $this->actingAs($this->siswaA)
+            ->post(route('siswa.kuis.mulai', $kuisTerkunci))
+            ->assertRedirect(route('siswa.kuis.show', $kuisTerkunci))
+            ->assertSessionHas('galat');
+
+        // 5. Pengumuman: Siswa tidak bisa membaca pengumuman berstatus draf
+        $pengumumanDraf = \App\Models\Pengumuman::create([
+            'judul' => 'Pengumuman Draf Rahasia',
+            'isi' => 'Belum boleh dibaca siapapun',
+            'status' => 'draf',
+            'admin_id' => $this->admin->id,
+        ]);
+        $this->actingAs($this->siswaA)
+            ->get(route('siswa.pengumuman.show', $pengumumanDraf))
+            ->assertNotFound();
+
+        // 6. Siswa A menebak URL admin pengguna milik Siswa B
         $this->actingAs($this->siswaA)
             ->get(route('admin.pengguna.edit', $this->siswaB))
             ->assertForbidden();
 
-        // 4. Siswa A menebak URL penilaian esai admin
+        // 7. Siswa A menebak URL penilaian esai admin
         $this->actingAs($this->siswaA)
             ->get(route('admin.penilaian-esai.show', $percobaanB))
             ->assertForbidden();
@@ -264,7 +309,11 @@ class Langkah15KeamananDanAuditTest extends TestCase
         $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
         $this->assertNotEmpty($response->headers->get('Permissions-Policy'));
-        $this->assertNotEmpty($response->headers->get('Content-Security-Policy-Report-Only'));
+        
+        $csp = $response->headers->get('Content-Security-Policy-Report-Only');
+        $this->assertNotEmpty($csp);
+        $this->assertStringNotContainsString("'unsafe-inline'", (string) preg_replace('/style-src[^;]+;/', '', $csp), "script-src CSP tidak boleh memuat 'unsafe-inline'!");
+        $this->assertStringNotContainsString('cdn.jsdelivr.net', $csp, 'CSP tidak boleh bergantung pada cdn.jsdelivr.net!');
     }
 
     /**

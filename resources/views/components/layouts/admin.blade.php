@@ -18,7 +18,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="h-full font-sans text-ink antialiased bg-bg flex flex-col" x-data="{ bukaMenuHp: false }">
     <!-- Header Mobile & Desktop -->

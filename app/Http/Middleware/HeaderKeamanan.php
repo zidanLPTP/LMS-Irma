@@ -23,8 +23,9 @@ class HeaderKeamanan
 
         // Content Security Policy (dimulai dengan mode Report-Only sesuai rekomendasi fase audit)
         // Sumber frame YouTube nocookie, worker blob: untuk PDF.js, img-src data: & self, font Google & self
+        // script-src hanya 'self' dan 'unsafe-eval' (diperlukan untuk binding reaktivitas Alpine.js standar)
         $csp = "default-src 'self'; "
-            ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; "
+            ."script-src 'self' 'unsafe-eval'; "
             ."style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             ."font-src 'self' https://fonts.gstatic.com data:; "
             ."img-src 'self' data:; "

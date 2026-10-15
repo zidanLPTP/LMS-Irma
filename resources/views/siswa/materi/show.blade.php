@@ -59,7 +59,7 @@
             </x-kartu>
         @elseif ($materi->tipe === 'pdf')
             <!-- Penampil PDF Menggunakan PDF.js Lokal -->
-            <x-kartu class="p-4 sm:p-6 bg-white border border-border space-y-4">
+            <x-kartu id="wadah-penampil-pdf" data-url-pdf="{{ $urlPdfPrivat }}" class="p-4 sm:p-6 bg-white border border-border space-y-4">
                 <!-- Bar Kontrol Navigasi PDF -->
                 <div class="flex flex-wrap items-center justify-between gap-3 p-3 bg-surface rounded-xl border border-border">
                     <div class="flex items-center gap-2">
@@ -89,21 +89,6 @@
                     Gunakan tombol di atas untuk beralih halaman modul secara bertahap.
                 </div>
             </x-kartu>
-
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    if (window.initPenampilPdf) {
-                        window.initPenampilPdf(
-                            'canvas-pdf',
-                            '{{ $urlPdfPrivat }}',
-                            'status-halaman-pdf',
-                            'btn-prev-pdf',
-                            'btn-next-pdf',
-                            'wadah-pdf'
-                        );
-                    }
-                });
-            </script>
         @endif
 
         <!-- Bilah Navigasi Bawah Antar Materi -->

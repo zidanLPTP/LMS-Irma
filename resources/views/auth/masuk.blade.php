@@ -63,14 +63,4 @@
             </div>
         </x-kartu>
     </div>
-
-    <script>
-        try {
-            Object.keys(localStorage).forEach(function(key) {
-                if (key.startsWith('draf_esai_')) {
-                    localStorage.removeItem(key);
-                }
-            });
-        } catch (e) {}
-    </script>
 </x-layouts.induk>

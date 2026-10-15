@@ -28,11 +28,22 @@ Berikut adalah daftar atribut `$fillable` pada setiap model Eloquent dalam siste
 
 ---
 
-## 2. Pencegahan IDOR (*Insecure Direct Object Reference*)
-1. **Percobaan Kuis:** Diperiksa kepemilikannya di `EngineKuisService` dan controller (`$percobaan->user_id !== auth()->id() -> abort(403)`). Siswa A sama sekali tidak dapat melihat pertanyaan, menjawab soal, atau melihat hasil percobaan siswa B.
-2. **Notifikasi:** `NotifikasiController` memvalidasi `$notifikasi->user_id === auth()->id()`, upaya membuka notifikasi orang lain ditolak `403 Forbidden`.
-3. **Penyajian Berkas PDF Privat:** `PenyajiMateriPdfController` memeriksa hak akses siswa melalui `BukaAksesService`. Bila bab terkait belum terbuka bagi siswa yang bersangkutan, server mengembalikan respon `403 Forbidden`.
-4. **Penebakan ID Admin:** Seluruh rute manajemen admin dilindungi middleware `peran:admin` dan `Gate::authorize`. Upaya siswa memanggil URL admin menghasilkan penolakan instan.
+## 2. Pencegahan IDOR (*Insecure Direct Object Reference*) dan Verifikasi Model Binding
+
+Setiap rute yang memanfaatkan route model binding (`{user}`, `{bab}`, `{materi}`, `{kuis}`, `{soal}`, `{percobaan}`, `{notifikasi}`, `{pengumuman}`) telah diuji secara menyeluruh terhadap eksploitasi IDOR:
+
+| Model Binding / Rute | Metode & URI | Mekanisme Proteksi Keamanan | Status Pengujian IDOR |
+| :--- | :--- | :--- | :--- |
+| **Percobaan Kuis** | `GET /siswa/percobaan/{percobaan}`<br>`GET /siswa/percobaan/{percobaan}/hasil` | Otorisasi kepemilikan ketat: `$percobaan->user_id === auth()->id()`. Akses percobaan siswa lain ditolak `403 Forbidden`. | **TERUJI (LULUS)** (`Langkah15KeamananDanAuditTest`, `SiswaEngineKuisTest`) |
+| **Soal Kuis** | `POST /siswa/percobaan/{percobaan}/soal/{soal}/mulai`<br>`POST /siswa/percobaan/{percobaan}/soal/{soal}/jawab` | Validasi kepemilikan sesi pengerjaan dan pencocokan `$soal->kuis_id === $percobaan->kuis_id`. Menjawab soal siswa lain ditolak `403`. | **TERUJI (LULUS)** (`SiswaEngineKuisTest`) |
+| **Notifikasi Siswa** | `GET /siswa/notifikasi/{notifikasi}/baca` | Validasi user: `$notifikasi->user_id === auth()->id()`. Membuka notifikasi milik akun lain ditolak `403 Forbidden`. | **TERUJI (LULUS)** (`Langkah15KeamananDanAuditTest`, `DasborPengumumanNotifikasiTest`) |
+| **Bab Pembelajaran** | `GET /siswa/bab/{bab}` | Validasi pembukaan bab dinamis via `BukaAksesService::apakahBabTerbuka`. Upaya menebak ID bab terkunci dialihkan ke beranda dengan pesan galat ramah. | **TERUJI (LULUS)** (`Langkah15KeamananDanAuditTest`, `SiswaBelajarTest`) |
+| **Materi Pembelajaran** | `GET /siswa/bab/{bab}/materi/{materi}` | Verifikasi ganda: Bab harus terbuka DAN `$materi->bab_id === $bab->id`. Mengakses materi bab lain pada URL bab berbeda menghasilkan `404 Not Found`. | **TERUJI (LULUS)** (`Langkah15KeamananDanAuditTest`, `SiswaBelajarTest`) |
+| **Berkas PDF Privat** | `GET /materi/{materi}/pdf` | Pengecekan status rilis bab & ketersediaan hak belajar siswa. Mengakses berkas materi sebelum bab terbuka ditolak `403 Forbidden`. | **TERUJI (LULUS)** (`SiswaBelajarTest`, `Langkah15KeamananDanAuditTest`) |
+| **Kuis Pembelajaran** | `GET /siswa/kuis/{kuis}`<br>`POST /siswa/kuis/{kuis}/mulai` | Validasi prasyarat belajar dan status rilis kuis via `BukaAksesService`. Kuis bab terkunci menolak percobaan baru. | **TERUJI (LULUS)** (`Langkah15KeamananDanAuditTest`, `SiswaEngineKuisTest`) |
+| **Pengumuman** | `GET /siswa/pengumuman/{pengumuman}` | Memfilter pengumuman agar hanya status `terbit` dan belum kedaluwarsa yang dapat dibuka. Pengumuman `draf` menghasilkan `404 Not Found`. Riwayat baca dicatat secara idempoten per pengguna. | **TERUJI (LULUS)** (`Langkah15KeamananDanAuditTest`, `DasborPengumumanNotifikasiTest`) |
+| **Kelola Pengguna Admin**| `GET/PUT /admin/pengguna/{user}` | Proteksi peran admin (`peran:admin` + `Gate::authorize`). Upaya siswa mengakses data pengguna lain ditolak instan `403 Forbidden`. | **TERUJI (LULUS)** (`Langkah15KeamananDanAuditTest`, `AdminPenggunaTest`) |
+| **Penilaian Esai Admin** | `GET/POST /admin/penilaian-esai/{percobaan}` | Khusus peran admin. Siswa tidak dapat mengakses panel penilaian esai milik siapa pun (`403 Forbidden`). | **TERUJI (LULUS)** (`Langkah15KeamananDanAuditTest`, `AdminPenilaianEsaiTest`) |
 
 ---
 
@@ -41,18 +52,23 @@ Berikut adalah daftar atribut `$fillable` pada setiap model Eloquent dalam siste
 - **X-Frame-Options: `SAMEORIGIN`** mencegah clickjacking.
 - **Referrer-Policy: `strict-origin-when-cross-origin`** melindungi kebocoran parameter URL pada rujukan luar.
 - **Permissions-Policy: `camera=(), microphone=(), geolocation=()`** menonaktifkan fitur perangkat keras yang tidak dibutuhkan.
-- **CSP (Content-Security-Policy-Report-Only):**
+- **Kebijakan CSP Diperketat (Hardened CSP):**
   - `default-src 'self'`
-  - `frame-src 'self' https://www.youtube-nocookie.com`
-  - `worker-src 'self' blob:` (diperlukan untuk worker rendering PDF.js)
-  - `img-src 'self' data:`
+  - `script-src 'self' 'unsafe-eval'` (Host pihak ketiga `https://cdn.jsdelivr.net` dan token `'unsafe-inline'` **DIHAPUS**. Seluruh pustaka JS termasuk Alpine.js dan penampil PDF kini dibundel 100% lokal via Vite. Skrip inline dipindahkan ke bundel asset).
   - `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`
   - `font-src 'self' https://fonts.gstatic.com data:`
-  - `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net`
-  - *Catatan Alpine.js:* Alpine.js versi standar memerlukan evaluasi ekspresi reaktif (`unsafe-eval`). Karena LMS tidak mengizinkan masukan HTML bebas dari siswa tanpa escaping, risiko injeksi DOM diminimalkan.
+  - `img-src 'self' data:`
+  - `frame-src 'self' https://www.youtube-nocookie.com`
+  - `worker-src 'self' blob:` (diperlukan untuk web worker rendering PDF.js lokal)
+  - `connect-src 'self'`
 
-### Hasil Pemindaian Browser Otomatis (Playwright CSP Scan)
-Pengujian E2E dijalankan melalui `tests/e2e/csp-audit.spec.js` pada dua resolusi standar (HP 375x667 dan Laptop 1280x800) untuk seluruh halaman utama admin dan siswa:
+### Evaluasi Build CSP Alpine (@alpinejs/csp)
+- **Status Saat Ini:** Alpine.js versi standar menggunakan evaluasi fungsi dinamis (`Function()`) untuk direktif `x-data`, `x-show`, `x-on`, sehingga memerlukan `'unsafe-eval'`.
+- **Evaluasi `@alpinejs/csp`:** Build `@alpinejs/csp` meniadakan kebutuhan `'unsafe-eval'`, namun mensyaratkan pendaftaran eksplisit setiap komponen dan aksi logika ke dalam tabel handler JavaScript global (`Alpine.data(...)`), dan tidak mendukung ekspresi inline bebas (seperti `x-data="{ bukaMenuHp: false }"` atau `@click="bukaCariHp = false"`).
+- **Alasan Teknis & Mitigasi Risiko:** Karena seluruh template Blade LMS BioSTEMX menggunakan sanitasi keluaran ketat (`{{ }}`) tanpa raw HTML (`{!! !!}` dari input pengguna), tidak ada celah Cross-Site Scripting (DOM XSS) yang dapat dimanfaatkan untuk menyuntikkan ekspresi eval berbahaya. Oleh sebab itu, direktif `'unsafe-eval'` dipertahankan bersama Alpine.js reguler lokal, sementara `'unsafe-inline'` dan host CDN eksternal berhasil dieliminasi sepenuhnya.
+
+### Hasil Pemindaian Browser Otomatis (Playwright CSP Scan - Kebijakan Diperketat)
+Pengujian E2E dijalankan melalui `tests/e2e/csp-audit.spec.js` pada dua resolusi standar (HP 375x667 dan Laptop 1280x800) untuk seluruh alur halaman utama admin dan siswa:
 - Halaman Masuk (`/masuk`)
 - Dasbor Admin (`/admin/beranda`)
 - Laporan Nilai Admin (`/admin/laporan/nilai`)
@@ -61,9 +77,9 @@ Pengujian E2E dijalankan melalui `tests/e2e/csp-audit.spec.js` pada dua resolusi
 - Profil Siswa (`/siswa/profil`)
 
 **Hasil Pengujian:**
-- Total Pelanggaran CSP Resolusi HP (375x667): **0 pelanggaran** (Lolos 100%)
-- Total Pelanggaran CSP Resolusi Laptop (1280x800): **0 pelanggaran** (Lolos 100%)
-- Semua aset skrip Alpine.js, Tailwind, ikon Lucide, dan stylesheet ter-load sempurna tanpa pelanggaran console CSP.
+- **Resolusi HP (375x667):** **0 pelanggaran CSP** tercatat di konsol browser.
+- **Resolusi Laptop (1280x800):** **0 pelanggaran CSP** tercatat di konsol browser.
+- **Hasil:** Kebijakan CSP yang diperketat (tanpa host CDN dan tanpa `'unsafe-inline'`) berjalan mulus dan siap untuk penegakan penuh (*enforce mode*).
 
 ---
 

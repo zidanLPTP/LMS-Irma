@@ -107,3 +107,18 @@ window.initPenampilPdf = function (canvasId, pdfUrl, statusInfoId, btnPrevId, bt
         }
     });
 };
+
+// Inisialisasi otomatis jika elemen penampil PDF tersedia di halaman
+document.addEventListener('DOMContentLoaded', function () {
+    const wadahPdf = document.getElementById('wadah-penampil-pdf');
+    if (wadahPdf && wadahPdf.dataset.urlPdf) {
+        window.initPenampilPdf(
+            'canvas-pdf',
+            wadahPdf.dataset.urlPdf,
+            'status-halaman-pdf',
+            'btn-prev-pdf',
+            'btn-next-pdf',
+            'wadah-pdf'
+        );
+    }
+});
