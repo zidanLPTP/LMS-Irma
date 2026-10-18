@@ -34,7 +34,8 @@ class PasswordController extends Controller
             'wajib_ganti_password' => false,
         ]);
 
-        return redirect()->route('siswa.beranda')
-            ->with('sukses', 'Kata sandi Anda berhasil diperbarui.');
+        $tujuan = $user->isAdmin() ? route('admin.beranda') : route('siswa.beranda');
+
+        return redirect($tujuan)->with('sukses', 'Kata sandi Anda berhasil diperbarui.');
     }
 }

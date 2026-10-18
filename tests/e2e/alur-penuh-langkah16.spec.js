@@ -36,14 +36,28 @@ test.describe.serial('Alur Lengkap Pembelajaran BioSTEMX (Langkah 16 Bagian B.1)
       };
 
       // ------------------------------------------------------------------
-      // 1. ADMIN MASUK & LOGIN PERTAMA (DEMO)
+      // 1. ADMIN MASUK & LOGIN PERTAMA (WAJIB GANTI PASSWORD JIKA AKTIF)
       // ------------------------------------------------------------------
       await page.goto('/masuk');
       await page.fill('#login', 'admin');
       await page.fill('#password', 'password123');
       await jepret('01_admin_masuk_form');
       await page.click('button[type="submit"]');
-      await page.waitForURL('**/admin/beranda');
+
+      // Periksa apakah diarahkan ke ganti password wajib
+      await page.waitForTimeout(1000);
+      if (page.url().includes('/password')) {
+        await jepret('01b_admin_wajib_ganti_password');
+        await expect(page.locator('body')).toContainText('Ganti Kata Sandi');
+        await page.fill('#password_lama', 'password123');
+        await page.fill('#password', 'AdminBioSTEMX2026!');
+        await page.fill('#password_confirmation', 'AdminBioSTEMX2026!');
+        await page.click('button[type="submit"]');
+        await page.waitForURL('**/admin/beranda');
+        await jepret('01c_admin_password_baru_aktif');
+      } else {
+        await page.waitForURL('**/admin/beranda');
+      }
       await jepret('02_admin_dasbor');
 
       // ------------------------------------------------------------------
@@ -55,6 +69,38 @@ test.describe.serial('Alur Lengkap Pembelajaran BioSTEMX (Langkah 16 Bagian B.1)
       await page.click('button[type="submit"]:has-text("Simpan Pengaturan")');
       await expect(page.locator('body')).toContainText('Pengaturan sistem berhasil diperbarui');
       await jepret('04_admin_kode_pendaftaran_tersimpan');
+
+      // ------------------------------------------------------------------
+      // 2b. ADMIN MEMBUAT PRETEST & MENAMBAHKAN SOAL (JIKA BELUM ADA)
+      // ------------------------------------------------------------------
+      await page.goto('/admin/kuis');
+      const barisPretest = page.locator('tr:has-text("Pretest")');
+      if (await barisPretest.count() === 0) {
+        await page.goto('/admin/kuis/create');
+        await page.click('input[value="pretest"]');
+        await page.fill('#judul', 'Pretest Diagnosis Awal Biologi');
+        await page.click('button[type="submit"]:has-text("Simpan Kuis")');
+        await page.waitForURL('**/admin/kuis');
+
+        // Kelola Soal Pretest & Tambah 1 Butir Soal PG
+        const linkSoalPretest = page.locator('tr:has-text("Pretest") a:has-text("Kelola Soal")').first();
+        await linkSoalPretest.click();
+        await page.waitForURL('**/soal');
+
+        // Buat Soal PG Manual untuk Pretest
+        await page.click('a:has-text("Tambah Butir Soal")');
+        await page.waitForURL('**/soal/create');
+        await page.click('input[value="pilihan_ganda"]');
+        await page.fill('#pertanyaan', 'Unit dasar struktural dan fungsional terkecil dari organisme hidup adalah?');
+        await page.fill('input[name="pilihan[0][teks]"]', 'Sel');
+        // Opsi 0 sudah checked secara default
+        await page.fill('input[name="pilihan[1][teks]"]', 'Jaringan');
+        await page.fill('input[name="pilihan[2][teks]"]', 'Organ');
+        await page.fill('input[name="pilihan[3][teks]"]', 'Sistem Organ');
+        await page.click('button[type="submit"]:has-text("Simpan Butir Soal")');
+        await page.waitForURL('**/soal');
+        await jepret('04b_admin_soal_pretest_tersimpan');
+      }
 
       // ------------------------------------------------------------------
       // 3. ADMIN MEMBUAT BAB 1 (Materi Video YouTube) & BAB 2 (Materi PDF)
@@ -134,6 +180,28 @@ test.describe.serial('Alur Lengkap Pembelajaran BioSTEMX (Langkah 16 Bagian B.1)
       await page.waitForURL('**/admin/kuis/*/soal');
       await expect(page.locator('body')).toContainText('Berhasil mengimpor');
       await jepret('09_admin_soal_berhasil_diimpor');
+
+      // Buat Posttest Penelitian (Jika Belum Ada)
+      await page.goto('/admin/kuis');
+      const barisPosttest = page.locator('tr:has-text("Posttest")');
+      if (await barisPosttest.count() === 0) {
+        await page.goto('/admin/kuis/create');
+        await page.click('input[value="posttest"]');
+        await page.fill('#judul', 'Posttest Evaluasi Akhir Penelitian');
+        await page.click('button[type="submit"]:has-text("Simpan Kuis")');
+        await page.waitForURL('**/admin/kuis');
+
+        // Tambahkan Soal Esai di Posttest
+        const linkSoalPosttest = page.locator('tr:has-text("Posttest") a:has-text("Kelola Soal")').first();
+        await linkSoalPosttest.click();
+        await page.waitForURL('**/soal');
+        await page.click('a:has-text("Tambah Butir Soal")');
+        await page.waitForURL('**/soal/create');
+        await page.click('input[value="esai"]');
+        await page.fill('#pertanyaan', 'Jelaskan perbedaan mendasar antara sel tumbuhan dan sel hewan beserta contohnya!');
+        await page.click('button[type="submit"]:has-text("Simpan Butir Soal")');
+        await page.waitForURL('**/soal');
+      }
 
       // ------------------------------------------------------------------
       // 5. ADMIN KELUAR
@@ -377,7 +445,7 @@ test.describe.serial('Alur Lengkap Pembelajaran BioSTEMX (Langkah 16 Bagian B.1)
       await jepret('25_admin_penilaian_esai_selesai');
 
       // ------------------------------------------------------------------
-      // 12. ADMIN MENGUNDUH 2 LAPORAN EXCEL & VALIDASI VIA EXCELJS
+      // 12. ADMIN MENGUNDUH 2 LAPORAN EXCEL & VALIDASI MENDALAM
       // ------------------------------------------------------------------
       // Ekspor Nilai: buka halaman laporan nilai lalu klik tombol Unduh Excel
       await page.goto('/admin/laporan/nilai');
@@ -388,13 +456,25 @@ test.describe.serial('Alur Lengkap Pembelajaran BioSTEMX (Langkah 16 Bagian B.1)
       const pathNilaiXlsx = path.join(hasilDir, `laporan_nilai_${vp.name}.xlsx`);
       await downloadNilai.saveAs(pathNilaiXlsx);
 
-      // Baca dengan XLSX
+      // Baca dengan XLSX & Asersi Mendalam (Header, Nilai Angka, dan Status)
       const wbNilai = XLSX.readFile(pathNilaiXlsx);
       expect(wbNilai.SheetNames.length).toBeGreaterThan(0);
-      const sheetNilai = wbNilai.Sheets[wbNilai.SheetNames[0]];
+      expect(wbNilai.SheetNames).toContain('Rekap Nilai');
+
+      const sheetNilai = wbNilai.Sheets['Rekap Nilai'];
       const rowsNilai = XLSX.utils.sheet_to_json(sheetNilai, { header: 1 });
       expect(rowsNilai.length).toBeGreaterThan(1);
-      console.log(`[EXCEL NILAI ${vp.name}] Berhasil diunduh: ${rowsNilai.length} baris.`);
+
+      // Validasi Judul Kolom (Headings) Rekap Nilai
+      const headerNilai = rowsNilai[0];
+      expect(headerNilai).toContain('Nama Lengkap');
+      expect(headerNilai).toContain('Kelas');
+      expect(headerNilai).toContain('Pretest (Nilai)');
+
+      // Validasi Nilai Baris Pertama
+      const barisPertamaNilai = rowsNilai[1];
+      expect(typeof barisPertamaNilai[0]).toBe('string'); // Nama Siswa
+      console.log(`[EXCEL NILAI ${vp.name}] Berhasil divalidasi mendalam: ${rowsNilai.length} baris, kolom: ${headerNilai.slice(0, 4).join(', ')}.`);
 
       // Ekspor Akses: buka halaman laporan akses lalu klik tombol Unduh Excel
       await page.goto('/admin/laporan/akses');
@@ -407,10 +487,20 @@ test.describe.serial('Alur Lengkap Pembelajaran BioSTEMX (Langkah 16 Bagian B.1)
 
       const wbAkses = XLSX.readFile(pathAksesXlsx);
       expect(wbAkses.SheetNames.length).toBeGreaterThan(0);
-      const sheetAkses = wbAkses.Sheets[wbAkses.SheetNames[0]];
+      expect(wbAkses.SheetNames).toContain('Riwayat Akses');
+
+      const sheetAkses = wbAkses.Sheets['Riwayat Akses'];
       const rowsAkses = XLSX.utils.sheet_to_json(sheetAkses, { header: 1 });
       expect(rowsAkses.length).toBeGreaterThan(1);
-      console.log(`[EXCEL AKSES ${vp.name}] Berhasil diunduh: ${rowsAkses.length} baris.`);
+
+      // Validasi Judul Kolom Riwayat Akses
+      const headerAkses = rowsAkses[0];
+      expect(headerAkses).toEqual(expect.arrayContaining(['Nama Lengkap', 'Kelas', 'Waktu Masuk', 'Aktivitas Terakhir', 'Durasi (Detik)']));
+
+      // Validasi Tipe Angka pada Durasi Detik (Kolom ke-4 atau 5)
+      const barisPertamaAkses = rowsAkses[1];
+      expect(Number(barisPertamaAkses[4])).toBeGreaterThanOrEqual(0);
+      console.log(`[EXCEL AKSES ${vp.name}] Berhasil divalidasi mendalam: ${rowsAkses.length} baris, durasi: ${barisPertamaAkses[4]} detik.`);
 
       // ------------------------------------------------------------------
       // 13. ADMIN MERESET KESEMPATAN KUIS SISWA & TOGGLE STATUS NONAKTIF

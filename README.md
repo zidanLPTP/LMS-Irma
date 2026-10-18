@@ -90,14 +90,15 @@ Akses sistem di peramban melalui alamat: `http://localhost:8000`
 Jalankan perintah berikut sebelum melakukan komit kode:
 
 ```bash
-# Menjalankan seluruh pengujian logika bisnis (130+ Feature & Unit tests)
+# Menjalankan seluruh pengujian logika bisnis (146 Feature & Unit tests)
 php artisan test
 
 # Merapikan gaya penulisan kode sesuai standar Laravel Pint
 ./vendor/bin/pint
 
-# Menjalankan pengujian E2E browser Playwright (opsional lokal)
-npx playwright test
+# Menjalankan pengujian E2E browser Playwright lengkap & membuka laporan HTML
+npx playwright test tests/e2e/alur-penuh-langkah16.spec.js --reporter=html
+npx playwright show-report
 ```
 
 ---

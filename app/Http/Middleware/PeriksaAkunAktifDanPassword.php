@@ -36,7 +36,7 @@ class PeriksaAkunAktifDanPassword
 
                 if (! in_array($request->route()?->getName(), $ruteDiizinkan, true)) {
                     return redirect()->route('siswa.password.edit')
-                        ->with('peringatan', 'Kata sandi Anda telah direset oleh admin. Silakan buat kata sandi baru untuk melanjutkan.');
+                        ->with('peringatan', 'Kata sandi Anda perlu diganti. Silakan buat kata sandi baru untuk melanjutkan.');
                 }
             }
         }
