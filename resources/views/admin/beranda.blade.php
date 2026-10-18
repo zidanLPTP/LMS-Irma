@@ -103,7 +103,7 @@
                 <p class="text-xs text-muted">Dihitung dari nilai tertinggi per siswa yang telah tuntas dinilai (esai tertunda tidak diikutsertakan sampai dinilai).</p>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto focus:outline-none focus:ring-1 focus:ring-green-700 rounded-xl" tabindex="0" role="region" aria-label="Statistik Kuis Aktif">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="border-b border-border text-muted uppercase font-bold">
@@ -144,7 +144,7 @@
                 <p class="text-xs text-muted">10 kuis terakhir yang diserahkan oleh siswa.</p>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto focus:outline-none focus:ring-1 focus:ring-green-700 rounded-xl" tabindex="0" role="region" aria-label="Aktivitas Penyerahan Kuis Terbaru">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="border-b border-border text-muted uppercase font-bold">

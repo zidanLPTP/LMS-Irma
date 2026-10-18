@@ -36,7 +36,7 @@ test.describe('Audit Aksesibilitas WCAG (Langkah 16 Bagian B.2)', () => {
         await page.waitForURL('**/admin/beranda');
       } else if (item.peran === 'siswa') {
         await page.goto('/masuk');
-        await page.fill('#login', 'ahmad_fauzi');
+        await page.fill('#login', 'siswa_aksesibilitas');
         await page.fill('#password', 'password123');
         await page.click('button[type="submit"]');
         await page.waitForURL('**/siswa/beranda');
@@ -72,6 +72,9 @@ test.describe('Audit Aksesibilitas WCAG (Langkah 16 Bagian B.2)', () => {
       fs.writeFileSync(fileLog, JSON.stringify(ringkasanHasil, null, 2));
 
       console.log(`[AXE AUDIT] ${item.nama}: ${hasilAxe.violations.length} total isu (${pelanggaranKritis.length} serius/kritis)`);
+
+      // Penegasan ketat WCAG 2.1 AA: Wajib 0 pelanggaran kritis atau serius
+      expect(pelanggaranKritis.length, `Ditemukan ${pelanggaranKritis.length} pelanggaran aksesibilitas serius/kritis di ${item.nama}`).toBe(0);
     });
   }
 });

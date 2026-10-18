@@ -1,4 +1,4 @@
-# STYLEGUIDE — LMS Penelitian Sekolah
+/# STYLEGUIDE — LMS Penelitian Sekolah
 
 Panduan tampilan agar konsisten. Target pengguna adalah **siswa SMA** (sekitar 15–18 tahun), jadi tampilannya modern dan bersih, tidak kekanak-kanakan dan tidak kaku seperti situs instansi. Irma meminta nuansa **biologi**: hijau muda, biru langit, warna lembut, dan bebas selama terasa segar. Semua teks antarmuka berbahasa Indonesia. Nilai di bawah ini adalah usulan awal dan boleh disesuaikan setelah melihat tampilan nyata.
 
@@ -22,8 +22,9 @@ Definisikan sebagai variabel CSS dan konfigurasi Tailwind. Jangan menulis warna 
 | `green-50` | `#F0FAF4` | latar halaman, baris tabel selang-seling |
 | `green-100` | `#DCF3E6` | latar kartu/aksen lembut |
 | `green-300` | `#A8DDBF` | garis, ikon tidak aktif |
-| `green-500` | `#5DB88A` | aksen, progres |
-| `green-700` | `#2F7D5B` | **tombol utama**, tautan, judul |
+| `green-500` | `#5DB88A` | aksen, progres (non-teks) |
+| `green-700` | `#2F7D5B` | **tombol utama**, tautan, judul (di atas latar terang non-green-100) |
+| `green-800` | `#256349` | teks di atas latar `green-100` (lencana hijau, kartu sukses) |
 
 ### Biru langit (sekunder)
 | Token | Hex | Pemakaian |
@@ -31,8 +32,8 @@ Definisikan sebagai variabel CSS dan konfigurasi Tailwind. Jangan menulis warna 
 | `sky-50` | `#EFF8FD` | latar bagian sekunder |
 | `sky-100` | `#D9EFFA` | kartu info, penanda video |
 | `sky-300` | `#9ED3EE` | garis, aksen |
-| `sky-500` | `#4FAFDD` | aksen, tautan sekunder |
-| `sky-700` | `#1F6F9C` | tombol sekunder, ikon penting |
+| `sky-500` | `#4FAFDD` | aksen (non-teks) |
+| `sky-700` | `#1F6F9C` | tombol sekunder, tautan, teks info di atas latar terang |
 
 ### Netral dan status
 | Token | Hex | Pemakaian |
@@ -41,12 +42,22 @@ Definisikan sebagai variabel CSS dan konfigurasi Tailwind. Jangan menulis warna 
 | `muted` | `#5B6B66` | teks sekunder |
 | `border` | `#D6E4DD` | garis pemisah |
 | `bg` | `#F7FBF9` | latar dasar |
-| `success` | `#2F7D5B` | lulus |
-| `warning` | `#B7791F` | menunggu penilaian, waktu hampir habis |
-| `danger` | `#C0453F` | belum lulus, galat |
-| `locked` | `#9AA9A3` | bab terkunci |
+| `success` | `#2F7D5B` | lulus (tombol / non-teks) |
+| `warning` | `#B7791F` | aksen peringatan (non-teks) |
+| `warning-700` | `#8A5A00` | teks peringatan di atas latar terang / warning-50 |
+| `danger` | `#C0453F` | belum lulus, galat, teks bahaya |
+| `locked` | `#9AA9A3` | bab terkunci (elemen non-teks/garis) |
 
-Aturan kontras: teks gelap (`ink`, `green-700`, `sky-700`) di atas latar pastel; teks putih hanya di atas `green-700` atau `sky-700`. Jangan menaruh teks `green-500` atau `sky-500` untuk isi paragraf.
+### Aturan Kontras Warna (WCAG 2.1 AA)
+- **Teks kecil (< 18pt/24px):** Rasio kontras minimal **4.5:1** terhadap latar belakang.
+  - Teks kecil hanya boleh menggunakan: `ink` (#1F2D2A), `muted` (#5B6B66), `green-700` (#2F7D5B, di atas `#FFFFFF` atau `#F7FBF9`), `green-800` (#256349, di atas `#DCF3E6`), `sky-700` (#1F6F9C), `danger` (#C0453F), dan `warning-700` (#8A5A00).
+  - Teks di atas latar `green-100` (#DCF3E6) wajib memakai `text-green-800` (rasio ~5.1:1, lulus WCAG AA).
+  - Teks peringatan wajib memakai `text-warning-700` (#8A5A00, rasio ~5.3:1 di atas putih).
+  - `green-500`, `sky-500`, `warning`, dan `locked` **TIDAK DIGUNAKAN** sebagai warna teks maupun latar teks putih. Warna tersebut hanya untuk dekorasi dan elemen grafis non-teks.
+- **Elemen Grafis & User Interface Non-Teks:** Rasio kontras minimal **3:1** terhadap latar belakang.
+  - Bar progres, ikon status, dan checkbox aktif wajib memiliki rasio minimal 3:1 (misalnya bar progres `bg-green-700` di atas lintasan `bg-green-100`).
+  - Label status "Terkunci" memakai teks `muted` didampingi ikon gembok `x-ikon`.
+- **Teks Putih:** Hanya diletakkan di atas tombol `green-700`, `sky-700`, atau `danger`.
 
 ## 3. Tipografi
 

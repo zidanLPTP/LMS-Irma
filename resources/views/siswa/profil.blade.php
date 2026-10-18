@@ -28,10 +28,10 @@
             <x-kartu class="p-6 sm:p-8 space-y-5">
                 <!-- Username (Terkunci) -->
                 <div>
-                    <label class="block text-sm font-bold text-ink mb-1">
+                    <label for="username" class="block text-sm font-bold text-ink mb-1">
                         {{ __('profil.username') }}
                     </label>
-                    <input type="text" value="{{ $user->username }}" disabled
+                    <input type="text" id="username" value="{{ $user->username }}" disabled
                         class="w-full rounded-xl border border-border px-3.5 py-2.5 text-muted bg-surface cursor-not-allowed text-sm font-mono">
                     <p class="text-xs text-muted mt-1">{{ __('profil.username_keterangan') }}</p>
                 </div>

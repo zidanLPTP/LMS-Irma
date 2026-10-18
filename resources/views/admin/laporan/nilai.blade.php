@@ -60,7 +60,7 @@
 
         <!-- Wadah Tabel Responsif (Bisa digulir mendatar di HP) -->
         <x-kartu class="overflow-hidden border border-border p-0">
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto focus:outline-none focus:ring-1 focus:ring-green-700" tabindex="0" role="region" aria-label="Tabel Rekapitulasi Nilai Siswa">
                 <table class="w-full text-left text-xs text-ink whitespace-nowrap">
                     <thead class="bg-surface border-b border-border text-muted font-black uppercase tracking-wider">
                         <tr>

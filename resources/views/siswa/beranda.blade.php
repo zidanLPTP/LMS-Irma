@@ -160,12 +160,12 @@
                     @endphp
 
                     <div class="p-4 sm:p-5 rounded-2xl border transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4
-                        {{ $isTerbuka ? 'bg-white border-green-700 shadow-[0_2px_8px_rgba(22,101,52,0.08)]' : ($isSelesai ? 'bg-white border-border' : 'bg-surface/50 border-border opacity-70') }}">
+                        {{ $isTerbuka ? 'bg-white border-green-700 shadow-[0_2px_8px_rgba(22,101,52,0.08)]' : ($isSelesai ? 'bg-white border-border' : 'bg-white border-border') }}">
                         
                         <div class="flex items-start sm:items-center gap-4">
                             <!-- Indikator Status (Ikon Lucide + Bentuk) -->
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0
-                                {{ $isSelesai ? 'bg-green-100 text-green-700' : ($isTerbuka ? 'bg-green-700 text-white' : 'bg-border text-muted') }}">
+                                {{ $isSelesai ? 'bg-green-100 text-green-700' : ($isTerbuka ? 'bg-green-700 text-white' : 'bg-surface text-muted border border-border') }}">
                                 @if ($isSelesai)
                                     <x-ikon nama="check" ukuran="20" />
                                 @elseif ($isTerbuka)
@@ -181,8 +181,8 @@
 
                             <div class="space-y-0.5">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold uppercase tracking-wider
-                                        {{ $isSelesai ? 'text-green-700' : ($isTerbuka ? 'text-green-700' : 'text-muted') }}">
+                                    <span class="text-xs font-black uppercase tracking-wider
+                                        {{ $isSelesai ? 'text-green-800' : ($isTerbuka ? 'text-green-800' : 'text-ink') }}">
                                         Langkah {{ $index + 1 }} &bull; {{ ucfirst($item['tipe']) }}
                                     </span>
                                 </div>
@@ -200,7 +200,7 @@
                         <!-- Tombol Aksi / Status Teks -->
                         <div class="flex items-center gap-3 sm:self-center pl-14 sm:pl-0">
                             @if ($isSelesai)
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-800 border border-green-200">
                                     <x-ikon nama="check" ukuran="14" />
                                     Selesai
                                 </span>
@@ -225,7 +225,7 @@
                                     </x-tombol>
                                 @endif
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-surface text-muted border border-border">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-surface text-ink border border-border">
                                     <x-ikon nama="lock" ukuran="12" />
                                     Terkunci
                                 </span>

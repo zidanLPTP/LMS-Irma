@@ -67,20 +67,20 @@
                 <input type="hidden" name="tab" value="{{ $tab }}">
 
                 <div>
-                    <label class="block text-xs font-bold text-muted mb-1">{{ __('laporan.filter_tanggal_mulai') }}</label>
-                    <input type="date" name="tanggal_mulai" value="{{ $tanggalMulai }}"
+                    <label for="tanggal_mulai" class="block text-xs font-bold text-muted mb-1">{{ __('laporan.filter_tanggal_mulai') }}</label>
+                    <input type="date" id="tanggal_mulai" name="tanggal_mulai" value="{{ $tanggalMulai }}"
                         class="w-full text-xs rounded-xl border border-border px-3 py-2 text-ink bg-white focus:outline-none focus:ring-2 focus:ring-green-700">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-muted mb-1">{{ __('laporan.filter_tanggal_selesai') }}</label>
-                    <input type="date" name="tanggal_selesai" value="{{ $tanggalSelesai }}"
+                    <label for="tanggal_selesai" class="block text-xs font-bold text-muted mb-1">{{ __('laporan.filter_tanggal_selesai') }}</label>
+                    <input type="date" id="tanggal_selesai" name="tanggal_selesai" value="{{ $tanggalSelesai }}"
                         class="w-full text-xs rounded-xl border border-border px-3 py-2 text-ink bg-white focus:outline-none focus:ring-2 focus:ring-green-700">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-muted mb-1">{{ __('laporan.filter_cari_siswa') }}</label>
-                    <input type="text" name="cari" value="{{ $cari }}" placeholder="Nama / Username..."
+                    <label for="cari_siswa" class="block text-xs font-bold text-muted mb-1">{{ __('laporan.filter_cari_siswa') }}</label>
+                    <input type="text" id="cari_siswa" name="cari" value="{{ $cari }}" placeholder="Nama / Username..."
                         class="w-full text-xs rounded-xl border border-border px-3 py-2 text-ink bg-white focus:outline-none focus:ring-2 focus:ring-green-700">
                 </div>
 
@@ -113,7 +113,7 @@
 
         <!-- Wadah Tabel Responsif (Bisa digulir mendatar di HP) -->
         <x-kartu class="overflow-hidden border border-border p-0">
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto focus:outline-none focus:ring-1 focus:ring-green-700" tabindex="0" role="region" aria-label="Tabel Laporan Akses Siswa">
                 @if ($tab === 'riwayat')
                     <table class="w-full text-left text-xs text-ink">
                         <thead class="bg-surface border-b border-border text-muted font-black uppercase tracking-wider">

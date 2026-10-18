@@ -137,7 +137,7 @@
             @if ($riwayatPengaturan->isEmpty())
                 <p class="text-sm text-muted py-4 text-center">{{ __('pengaturan.riwayat.kosong') }}</p>
             @else
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto focus:outline-none focus:ring-1 focus:ring-green-700 rounded-xl" tabindex="0" role="region" aria-label="{{ __('pengaturan.riwayat.judul') }}">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
                             <tr class="border-b border-border text-muted uppercase font-bold">

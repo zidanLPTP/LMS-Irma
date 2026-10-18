@@ -28,7 +28,7 @@
                         $isBelumDibaca = is_null($notif->dibaca_pada);
                     @endphp
                     <a href="{{ route('siswa.notifikasi.buka', $notif) }}"
-                        class="block p-4 sm:p-5 rounded-2xl border transition-all duration-200 {{ $isBelumDibaca ? 'bg-white border-green-600 shadow-sm' : 'bg-surface/50 border-border opacity-80' }}">
+                        class="block p-4 sm:p-5 rounded-2xl border transition-all duration-200 {{ $isBelumDibaca ? 'bg-white border-green-600 shadow-sm' : 'bg-white border-border' }}">
                         <div class="flex items-start gap-4">
                             <div class="p-2.5 rounded-xl shrink-0 {{ $isBelumDibaca ? 'bg-green-100 text-green-700' : 'bg-border text-muted' }}">
                                 <x-ikon nama="bell" ukuran="20" />
@@ -39,7 +39,7 @@
                                     <h2 class="text-sm font-extrabold text-ink {{ $isBelumDibaca ? 'text-green-950 font-black' : '' }}">
                                         {{ $notif->judul }}
                                     </h2>
-                                    <span class="text-[11px] text-muted shrink-0">
+                                    <span class="text-xs font-bold text-ink shrink-0">
                                         {{ $notif->created_at->diffForHumans() }}
                                     </span>
                                 </div>

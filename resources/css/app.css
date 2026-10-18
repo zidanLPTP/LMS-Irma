@@ -20,6 +20,7 @@
     --color-green-300: #A8DDBF;
     --color-green-500: #5DB88A;
     --color-green-700: #2F7D5B;
+    --color-green-800: #256349;
 
     /* Token Biru Langit (Sekunder) */
     --color-sky-50: #EFF8FD;
@@ -35,6 +36,7 @@
     --color-bg: #F7FBF9;
     --color-success: #2F7D5B;
     --color-warning: #B7791F;
+    --color-warning-700: #8A5A00;
     --color-danger: #C0453F;
     --color-locked: #9AA9A3;
 }

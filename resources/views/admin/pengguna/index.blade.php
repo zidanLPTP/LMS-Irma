@@ -52,10 +52,10 @@
         <div class="bg-white rounded-2xl border border-border p-4 shadow-sm">
             <form method="GET" action="{{ route('admin.pengguna.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div class="lg:col-span-2">
-                    <input type="text" name="cari" value="{{ $cari }}" placeholder="{{ __('pengguna.cari_placeholder') }}" class="w-full px-3.5 py-2 text-sm bg-bg border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700">
+                    <input type="text" name="cari" value="{{ $cari }}" aria-label="{{ __('pengguna.cari_placeholder') }}" placeholder="{{ __('pengguna.cari_placeholder') }}" class="w-full px-3.5 py-2 text-sm bg-bg border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700">
                 </div>
                 <div>
-                    <select name="kelas" class="w-full px-3 py-2 text-sm bg-bg border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700">
+                    <select name="kelas" aria-label="{{ __('pengguna.semua_kelas') }}" class="w-full px-3 py-2 text-sm bg-bg border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700">
                         <option value="">{{ __('pengguna.semua_kelas') }}</option>
                         @foreach ($daftarKelas as $k)
                             <option value="{{ $k }}" {{ $kelasDipilih === $k ? 'selected' : '' }}>{{ $k }}</option>
@@ -63,7 +63,7 @@
                     </select>
                 </div>
                 <div class="flex gap-2">
-                    <select name="status" class="w-full px-3 py-2 text-sm bg-bg border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700">
+                    <select name="status" aria-label="{{ __('pengguna.semua_status') }}" class="w-full px-3 py-2 text-sm bg-bg border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-700">
                         <option value="">{{ __('pengguna.semua_status') }}</option>
                         <option value="aktif" {{ $statusDipilih === 'aktif' ? 'selected' : '' }}>{{ __('pengguna.aktif') }}</option>
                         <option value="nonaktif" {{ $statusDipilih === 'nonaktif' ? 'selected' : '' }}>{{ __('pengguna.nonaktif') }}</option>
