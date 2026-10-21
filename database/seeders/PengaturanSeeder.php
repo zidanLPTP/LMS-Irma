@@ -14,7 +14,7 @@ class PengaturanSeeder extends Seeder
     {
         $dataPengaturan = [
             'nama_situs' => 'BioSTEMX',
-            'logo_situs' => 'unggahan/logo_biostemx.png',
+            'logo_situs' => 'gambar/logo_biostemx.png',
             'nilai_lulus' => '65.00',
             'batas_waktu_per_soal' => '60',
             'maksimal_kesempatan' => '2',
