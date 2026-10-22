@@ -152,7 +152,7 @@
 
             <!-- Stepper List -->
             <div class="space-y-3">
-                @foreach ($daftarLangkah as $index => $item)
+                @forelse ($daftarLangkah as $index => $item)
                     @php
                         $isSelesai = $item['status'] === 'selesai';
                         $isTerbuka = $item['status'] === 'terbuka';
@@ -232,7 +232,13 @@
                             @endif
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="p-8 text-center bg-white border border-border rounded-2xl">
+                        <x-ikon nama="book-open" ukuran="36" kelas="mx-auto text-muted mb-2" />
+                        <h3 class="text-sm font-bold text-ink">Materi Belum Tersedia</h3>
+                        <p class="text-xs text-muted mt-1">Administrator sedang menyiapkan tahapan pembelajaran dan materi modul biologi untuk Anda.</p>
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>
