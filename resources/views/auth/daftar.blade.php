@@ -1,10 +1,20 @@
 <x-layouts.induk judul="Daftar Akun Siswa">
     <div class="max-w-md mx-auto">
         <x-kartu class="p-6 sm:p-8">
+            @php
+                $namaSitusApp = \App\Models\Pengaturan::ambil('nama_situs', config('app.name', 'BioSTEMX'));
+                $logoSitusApp = \App\Models\Pengaturan::ambil('logo_situs', 'gambar/logo_biostemx.png');
+            @endphp
             <div class="text-center mb-6">
-                <div class="inline-flex p-3 bg-green-100 rounded-2xl text-green-700 mb-3">
-                    <x-ikon nama="leaf" ukuran="32" kelas="text-green-700" />
-                </div>
+                @if ($logoSitusApp && file_exists(public_path($logoSitusApp)))
+                    <div class="flex justify-center mb-3">
+                        <img src="{{ asset($logoSitusApp) }}" alt="{{ $namaSitusApp }}" class="h-14 sm:h-16 w-auto max-w-[220px] object-contain">
+                    </div>
+                @else
+                    <div class="inline-flex p-3 bg-green-50 rounded-2xl text-green-700 mb-2">
+                        <x-ikon nama="leaf" ukuran="36" kelas="text-green-700" />
+                    </div>
+                @endif
                 <h1 class="text-2xl font-extrabold text-ink">Daftar Akun Siswa</h1>
                 <p class="text-sm text-muted mt-1">Buat akun untuk memulai pembelajaran biologi</p>
             </div>

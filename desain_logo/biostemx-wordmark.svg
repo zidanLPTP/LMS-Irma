@@ -1,0 +1,10 @@
+<svg id="logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 96" width="400" height="96" fill="none">
+    <g id="wordmark">
+        <text x="200" y="52" text-anchor="middle" font-family="'Nunito', system-ui, -apple-system, sans-serif" font-size="52" font-weight="900" fill="#1F2D2A" letter-spacing="-0.5">
+            Bio<tspan fill="#2F7D5B">STEM</tspan><tspan fill="#4FAFDD">X</tspan>
+        </text>
+        <text x="200" y="78" text-anchor="middle" font-family="'Nunito', system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="800" fill="#5B6B66" letter-spacing="3.2">
+            PENELITIAN &amp; SAINS SISWA
+        </text>
+    </g>
+</svg>
