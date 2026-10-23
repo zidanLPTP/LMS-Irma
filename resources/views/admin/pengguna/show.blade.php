@@ -20,7 +20,7 @@
                 </a>
 
                 <!-- Reset Password Admin Button -->
-                <form method="POST" action="{{ route('admin.pengguna.reset-password', $pengguna) }}" onsubmit="return confirm('Apakah Anda yakin ingin mereset kata sandi siswa ini ke kata sandi acak sementara?')">
+                <form method="POST" action="{{ route('admin.pengguna.reset-password', $pengguna) }}" data-konfirmasi="Apakah Anda yakin ingin mereset kata sandi siswa ini ke kata sandi acak sementara?" data-konfirmasi-bahaya="false" data-konfirmasi-tombol="Ya, Reset Sandi">
                     @csrf
                     <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl transition-colors">
                         <x-ikon nama="key-round" ukuran="14" />
@@ -33,7 +33,7 @@
                     @csrf
                     @method('PATCH')
                     @if ($pengguna->aktif)
-                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-red-800 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors" onclick="return confirm('Nonaktifkan akun siswa ini? Sesi yang sedang aktif akan langsung dikeluarkan.')">
+                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-red-800 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors" data-konfirmasi="Nonaktifkan akun siswa ini? Sesi yang sedang aktif akan langsung dikeluarkan." data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Nonaktifkan">
                             <x-ikon nama="user-x" ukuran="14" />
                             <span>Nonaktifkan</span>
                         </button>
@@ -127,7 +127,7 @@
                 <div class="bg-white rounded-2xl border border-border p-5 shadow-sm space-y-3">
                     <h2 class="text-sm font-black text-ink uppercase tracking-wider border-b border-border pb-2">Reset Kesempatan Kuis</h2>
                     <p class="text-xs text-muted">Admin dapat membatalkan percobaan sebelumnya agar siswa bisa mengulang kuis. Data percobaan lama tidak dihapus.</p>
-                    <form method="POST" action="{{ route('admin.pengguna.reset-kesempatan', $pengguna) }}" class="space-y-3" onsubmit="return confirm('Batalkan seluruh percobaan siswa pada kuis ini untuk mereset kesempatan?')">
+                    <form method="POST" action="{{ route('admin.pengguna.reset-kesempatan', $pengguna) }}" class="space-y-3" data-konfirmasi="Batalkan seluruh percobaan siswa pada kuis ini untuk mereset kesempatan?" data-konfirmasi-bahaya="false" data-konfirmasi-tombol="Ya, Reset Kesempatan">
                         @csrf
                         <div>
                             <label for="kuis_id" class="block text-xs font-bold text-muted mb-1">Pilih Kuis</label>

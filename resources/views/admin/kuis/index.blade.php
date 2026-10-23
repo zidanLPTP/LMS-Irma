@@ -88,7 +88,7 @@
                                             <x-ikon nama="pencil" ukuran="14" />
                                             <span>Ubah</span>
                                         </x-tombol>
-                                        <form method="POST" action="{{ route('admin.kuis.destroy', $kuis) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kuis ini?');" class="inline">
+                                        <form method="POST" action="{{ route('admin.kuis.destroy', $kuis) }}" data-konfirmasi="Apakah Anda yakin ingin menghapus kuis ini?" data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Hapus" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <x-tombol tipe="bahaya" class="!min-h-[32px] !px-2.5 !py-1 text-xs" type="submit">

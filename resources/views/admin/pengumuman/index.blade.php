@@ -57,7 +57,7 @@
                                     Ubah
                                 </x-tombol>
 
-                                <form method="POST" action="{{ route('admin.pengumuman.destroy', $pengumuman) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengumuman ini?');">
+                                <form method="POST" action="{{ route('admin.pengumuman.destroy', $pengumuman) }}" data-konfirmasi="Apakah Anda yakin ingin menghapus pengumuman ini?" data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Hapus">
                                     @csrf
                                     @method('DELETE')
                                     <x-tombol tipe="bahaya" class="!min-h-[36px] !px-3 text-xs">

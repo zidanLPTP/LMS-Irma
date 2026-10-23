@@ -27,7 +27,7 @@
             @endphp
             <a href="/" class="flex items-center gap-2 text-green-700 font-extrabold text-lg">
                 @if ($logoSitusApp && file_exists(public_path($logoSitusApp)))
-                    <img src="{{ asset($logoSitusApp) }}" alt="BioSTEMX" width="156" height="36" class="h-9 w-auto max-w-[160px] object-contain">
+                    <img src="{{ asset($logoSitusApp) }}" alt="{{ $namaSitusApp }}" width="156" height="36" class="h-9 w-auto max-w-[160px] object-contain">
                 @else
                     <x-ikon nama="leaf" ukuran="24" kelas="text-green-700" />
                     <span>{{ $namaSitusApp }}</span>

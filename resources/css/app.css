@@ -46,3 +46,155 @@
     --warna-bg: #F7FBF9;
     --warna-ink: #1F2D2A;
 }
+
+/* ==========================================================================
+   Kustomisasi Tema SweetAlert2 (BioSTEMX LMS)
+   ========================================================================== */
+div.swal2-container {
+    z-index: 100000;
+}
+
+div.swal2-popup.swal2-biostemx-popup {
+    font-family: var(--font-sans, 'Nunito', system-ui, sans-serif);
+    background: #ffffff;
+    border-radius: 1rem;
+    border: 1px solid #D6E4DD;
+    padding: 1.5rem;
+    box-shadow: 0 20px 25px -5px rgba(31, 45, 42, 0.12), 0 8px 10px -6px rgba(31, 45, 42, 0.08);
+    width: 24rem;
+    max-width: calc(100vw - 2rem);
+}
+
+div.swal2-icon {
+    margin: 0.5rem auto 1rem auto;
+    width: 3.5rem;
+    height: 3.5rem;
+}
+
+div.swal2-icon.swal2-warning {
+    border-color: #B7791F;
+    color: #B7791F;
+}
+
+div.swal2-icon.swal2-error {
+    border-color: #C0453F;
+    color: #C0453F;
+}
+
+div.swal2-icon.swal2-success {
+    border-color: #2F7D5B;
+    color: #2F7D5B;
+}
+
+div.swal2-icon.swal2-question {
+    border-color: #1F6F9C;
+    color: #1F6F9C;
+}
+
+div.swal2-title.swal2-biostemx-title {
+    font-family: var(--font-sans, 'Nunito', system-ui, sans-serif);
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: #1F2D2A;
+    padding: 0;
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+}
+
+div.swal2-html-container.swal2-biostemx-html {
+    font-family: var(--font-sans, 'Nunito', system-ui, sans-serif);
+    font-size: 0.875rem;
+    color: #5B6B66;
+    line-height: 1.5;
+    margin: 0 0 1.25rem 0;
+    padding: 0;
+    text-align: center;
+}
+
+div.swal2-actions.swal2-biostemx-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.swal2-biostemx-btn-utama {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    border-radius: 0.75rem;
+    background-color: #2F7D5B;
+    color: #ffffff;
+    border: 1px solid transparent;
+    cursor: pointer;
+    min-height: 38px;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.swal2-biostemx-btn-utama:hover {
+    background-color: #256349;
+}
+
+.swal2-biostemx-btn-utama:focus-visible {
+    outline: 2px solid #2F7D5B;
+    outline-offset: 2px;
+}
+
+.swal2-biostemx-btn-bahaya {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    border-radius: 0.75rem;
+    background-color: #C0453F;
+    color: #ffffff;
+    border: 1px solid transparent;
+    cursor: pointer;
+    min-height: 38px;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.swal2-biostemx-btn-bahaya:hover {
+    background-color: #a33630;
+}
+
+.swal2-biostemx-btn-bahaya:focus-visible {
+    outline: 2px solid #C0453F;
+    outline-offset: 2px;
+}
+
+.swal2-biostemx-btn-batal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    border-radius: 0.75rem;
+    background-color: #ffffff;
+    color: #5B6B66;
+    border: 1px solid #D6E4DD;
+    cursor: pointer;
+    min-height: 38px;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.swal2-biostemx-btn-batal:hover {
+    background-color: #F7FBF9;
+    color: #1F2D2A;
+    border-color: #b5cdc2;
+}
+
+.swal2-biostemx-btn-batal:focus-visible {
+    outline: 2px solid #5B6B66;
+    outline-offset: 2px;
+}
+

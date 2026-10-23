@@ -78,7 +78,7 @@
                                             </td>
                                             <td class="py-2.5 px-3 text-right">
                                                 @if (! $punyaData)
-                                                    <form method="POST" action="{{ route('admin.pengguna.destroy', $akun) }}" onsubmit="return confirm('{{ __('pengguna.akun_ganda.hapus_konfirmasi') }}')">
+                                                    <form method="POST" action="{{ route('admin.pengguna.destroy', $akun) }}" data-konfirmasi="{{ __('pengguna.akun_ganda.hapus_konfirmasi') }}" data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Hapus">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 rounded-lg transition-colors">

@@ -519,6 +519,10 @@ test.describe.serial('Alur Lengkap Pembelajaran BioSTEMX (Langkah 16 Bagian B.1)
         await page.fill('input[name="alasan"], textarea[name="alasan"]', 'Pengujian E2E reset kesempatan kuis');
         page.once('dialog', async dialog => await dialog.accept());
         await formReset.locator('button[type="submit"]').click();
+        const swalConfirm = page.locator('.swal2-confirm');
+        if (await swalConfirm.isVisible({ timeout: 1500 }).catch(() => false)) {
+          await swalConfirm.click();
+        }
         await page.waitForLoadState('networkidle');
         await expect(page.locator('body')).toContainText('berhasil');
         await jepret('27_admin_kesempatan_direset');
@@ -528,6 +532,10 @@ test.describe.serial('Alur Lengkap Pembelajaran BioSTEMX (Langkah 16 Bagian B.1)
       const formToggle = page.locator('form[action*="/toggle-aktif"]').first();
       page.once('dialog', async dialog => await dialog.accept());
       await formToggle.locator('button[type="submit"]').click();
+      const swalToggleConfirm = page.locator('.swal2-confirm');
+      if (await swalToggleConfirm.isVisible({ timeout: 1500 }).catch(() => false)) {
+        await swalToggleConfirm.click();
+      }
       await page.waitForLoadState('networkidle');
       await expect(page.locator('body')).toContainText('dinonaktifkan');
       await jepret('28_admin_siswa_dinonaktifkan');
