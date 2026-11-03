@@ -179,3 +179,5 @@ Jika Anda tidak dapat mengakses terminal SSH:
    php artisan lms:cetak-sql-admin --nama="Irma Pengelola" --username="admin_irma" --email="admin@sekolah.sch.id"
    ```
    Salin baris `INSERT INTO users ...` yang dicetak di terminal lokal, lalu tempel dan jalankan di tab **SQL** phpMyAdmin hosting Anda.
+
+

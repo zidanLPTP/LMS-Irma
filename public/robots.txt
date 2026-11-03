@@ -1,2 +1,23 @@
+# ==============================================================================
+# robots.txt — LMS Penelitian BioSTEMX (https://biostem.web.id)
+# ==============================================================================
+
 User-agent: *
-Disallow:
+
+# Izinkan mesin pencari (Google, Bing, dll.) merayapi halaman publik
+Allow: /
+Allow: /masuk
+Allow: /daftar
+Allow: /gambar/
+Allow: /build/
+
+# Larang perayapan area privat, panel admin, data siswa, dan kuis penelitian
+Disallow: /admin/
+Disallow: /siswa/
+Disallow: /materi-privat/
+Disallow: /kuis/
+Disallow: /evaluasi/
+Disallow: /keluar
+
+# Lokasi Peta Situs (Sitemap)
+Sitemap: https://biostem.web.id/sitemap.xml

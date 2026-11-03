@@ -50,7 +50,9 @@
                     <div>
                         <label for="username" class="block text-sm font-bold text-ink mb-1">Nama Pengguna (Username)</label>
                         <input type="text" id="username" name="username" value="{{ old('username') }}" required
+                            placeholder="Contoh: ahmad_siswa12"
                             class="w-full rounded-xl border border-border px-3.5 py-2.5 text-ink bg-white focus:outline-none focus:ring-2 focus:ring-green-700 text-sm">
+                        <p class="text-xs text-muted mt-1">Gunakan huruf, angka, setrip (-), atau garis bawah (_), tanpa spasi.</p>
                     </div>
 
                     <div>

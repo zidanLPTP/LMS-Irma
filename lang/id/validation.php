@@ -12,6 +12,7 @@ return [
     'email' => 'Kolom :attribute harus berupa alamat surel yang sah.',
     'unique' => ':Attribute sudah terdaftar.',
     'confirmed' => 'Konfirmasi :attribute tidak cocok.',
+    'alpha_dash' => ':Attribute hanya boleh berisi huruf, angka, setrip (-), dan garis bawah (_).',
     'attributes' => [
         'nama_lengkap' => 'nama lengkap',
         'username' => 'nama pengguna',

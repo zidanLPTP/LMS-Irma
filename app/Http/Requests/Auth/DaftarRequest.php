@@ -30,4 +30,16 @@ class DaftarRequest extends FormRequest
             'kelas' => ['nullable', 'string', 'max:50'],
         ];
     }
+
+    /**
+     * Dapatkan pesan kesalahan khusus untuk aturan yang ditentukan.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'username.alpha_dash' => 'Nama pengguna hanya boleh berisi huruf, angka, setrip (-), dan garis bawah (_), tanpa spasi.',
+        ];
+    }
 }
