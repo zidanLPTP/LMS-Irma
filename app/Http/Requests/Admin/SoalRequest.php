@@ -11,6 +11,22 @@ class SoalRequest extends FormRequest
         return $this->user() && $this->user()->isAdmin();
     }
 
+    /**
+     * Siapkan data input sebelum validasi dijalankan.
+     * Mengubah pilihan radio tunggal 'kunci_benar' menjadi penanda 'apakah_benar' per opsi.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('kunci_benar') && $this->input('tipe_soal') === 'pilihan_ganda') {
+            $kunciIndex = (int) $this->input('kunci_benar');
+            $pilihan = (array) $this->input('pilihan', []);
+            foreach ($pilihan as $idx => $p) {
+                $pilihan[$idx]['apakah_benar'] = ($idx === $kunciIndex) ? '1' : '0';
+            }
+            $this->merge(['pilihan' => $pilihan]);
+        }
+    }
+
     public function rules(): array
     {
         $soal = $this->route('soal');

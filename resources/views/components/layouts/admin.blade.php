@@ -67,6 +67,11 @@
             <a href="{{ route('admin.kuis.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.kuis.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
                 <x-ikon nama="clipboard-list" ukuran="18" />
                 <span>Kuis dan Soal</span>
+            </a>
+            <a href="{{ route('admin.tautan-edukasi.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.tautan-edukasi.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                <x-ikon nama="gamepad-2" ukuran="18" />
+                <span>Tautan Edukasi</span>
+            </a>
             <a href="{{ route('admin.pengguna.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.pengguna.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
                 <x-ikon nama="users" ukuran="18" />
                 <span>Kelola Pengguna</span>
@@ -110,6 +115,10 @@
                     <x-ikon nama="chart-bar" ukuran="18" />
                     <span>Laporan Nilai</span>
                 </a>
+                <a href="{{ route('admin.praktikalitas.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.praktikalitas.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="clipboard-check" ukuran="18" />
+                    <span>Praktikalitas Media</span>
+                </a>
             </div>
         </div>
     </header>
@@ -130,6 +139,10 @@
                 <a href="{{ route('admin.kuis.index') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.kuis.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
                     <x-ikon nama="clipboard-list" ukuran="20" />
                     <span>Kuis dan Soal</span>
+                </a>
+                <a href="{{ route('admin.tautan-edukasi.index') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.tautan-edukasi.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="gamepad-2" ukuran="20" />
+                    <span>Tautan Edukasi</span>
                 </a>
                 <a href="{{ route('admin.penilaian-esai.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.penilaian-esai.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
                     <div class="flex items-center gap-2">
@@ -165,6 +178,10 @@
                 <a href="{{ route('admin.laporan.nilai') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.laporan.nilai*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
                     <x-ikon nama="chart-bar" ukuran="20" />
                     <span>Laporan Nilai</span>
+                </a>
+                <a href="{{ route('admin.praktikalitas.index') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.praktikalitas.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="clipboard-check" ukuran="20" />
+                    <span>Praktikalitas Media</span>
                 </a>
             </div>
 

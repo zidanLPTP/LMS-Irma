@@ -47,6 +47,16 @@
                         <x-ikon nama="house" ukuran="18" />
                         <span>Beranda</span>
                     </a>
+                    <a href="{{ route('siswa.game-edukasi.index') }}"
+                        class="px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors {{ request()->routeIs('siswa.game-edukasi.*') ? 'bg-green-100 text-green-800' : 'text-muted hover:text-ink hover:bg-surface' }}">
+                        <x-ikon nama="gamepad-2" ukuran="18" />
+                        <span>Game Edukasi</span>
+                    </a>
+                    <a href="{{ route('siswa.praktikalitas.index') }}"
+                        class="px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors {{ request()->routeIs('siswa.praktikalitas.*') ? 'bg-green-100 text-green-800' : 'text-muted hover:text-ink hover:bg-surface' }}">
+                        <x-ikon nama="clipboard-check" ukuran="18" />
+                        <span>Praktikalitas</span>
+                    </a>
                     <a href="{{ route('siswa.nilai.index') }}"
                         class="px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-colors {{ request()->routeIs('siswa.nilai.*') ? 'bg-green-100 text-green-800' : 'text-muted hover:text-ink hover:bg-surface' }}">
                         <x-ikon nama="award" ukuran="18" />
@@ -149,26 +159,31 @@
     </main>
 
     <!-- Bilah Bawah Siswa di Layar HP (Bottom Bar with safe-area-inset-bottom) -->
-    <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border z-30 px-2 py-2 flex items-center justify-around"
+    <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border z-30 px-1 py-1.5 flex items-center justify-around"
          style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
         <a href="{{ route('siswa.beranda') }}"
-            class="flex flex-col items-center gap-1 text-[11px] font-bold py-1 px-2 rounded-xl {{ request()->routeIs('siswa.beranda') ? 'text-green-700' : 'text-muted hover:text-ink' }}">
-            <x-ikon nama="house" ukuran="20" />
+            class="flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-1.5 rounded-xl {{ request()->routeIs('siswa.beranda') ? 'text-green-700' : 'text-muted hover:text-ink' }}">
+            <x-ikon nama="house" ukuran="19" />
             <span>Beranda</span>
         </a>
+        <a href="{{ route('siswa.game-edukasi.index') }}"
+            class="flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-1.5 rounded-xl {{ request()->routeIs('siswa.game-edukasi.*') ? 'text-green-700' : 'text-muted hover:text-ink' }}">
+            <x-ikon nama="gamepad-2" ukuran="19" />
+            <span>Game</span>
+        </a>
+        <a href="{{ route('siswa.praktikalitas.index') }}"
+            class="flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-1.5 rounded-xl {{ request()->routeIs('siswa.praktikalitas.*') ? 'text-green-700' : 'text-muted hover:text-ink' }}">
+            <x-ikon nama="clipboard-check" ukuran="19" />
+            <span>Praktikal</span>
+        </a>
         <a href="{{ route('siswa.nilai.index') }}"
-            class="flex flex-col items-center gap-1 text-[11px] font-bold py-1 px-2 rounded-xl {{ request()->routeIs('siswa.nilai.*') ? 'text-green-700' : 'text-muted hover:text-ink' }}">
-            <x-ikon nama="award" ukuran="20" />
+            class="flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-1.5 rounded-xl {{ request()->routeIs('siswa.nilai.*') ? 'text-green-700' : 'text-muted hover:text-ink' }}">
+            <x-ikon nama="award" ukuran="19" />
             <span>Nilai</span>
         </a>
-        <a href="{{ route('siswa.pengumuman.index') }}"
-            class="flex flex-col items-center gap-1 text-[11px] font-bold py-1 px-2 rounded-xl {{ request()->routeIs('siswa.pengumuman.*') ? 'text-green-700' : 'text-muted hover:text-ink' }}">
-            <x-ikon nama="megaphone" ukuran="20" />
-            <span>Pengumuman</span>
-        </a>
         <a href="{{ route('siswa.profil.edit') }}"
-            class="flex flex-col items-center gap-1 text-[11px] font-bold py-1 px-2 rounded-xl {{ request()->routeIs('siswa.profil.*') ? 'text-green-700' : 'text-muted hover:text-ink' }}">
-            <x-ikon nama="user" ukuran="20" />
+            class="flex flex-col items-center gap-1 text-[10px] font-bold py-1 px-1.5 rounded-xl {{ request()->routeIs('siswa.profil.*') ? 'text-green-700' : 'text-muted hover:text-ink' }}">
+            <x-ikon nama="user" ukuran="19" />
             <span>Profil</span>
         </a>
     </nav>

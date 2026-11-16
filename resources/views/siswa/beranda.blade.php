@@ -143,6 +143,45 @@
             </div>
         @endif
 
+        <!-- Menu Aktivitas Pendukung (Game Edukasi & Lembar Praktikalitas) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <a href="{{ route('siswa.game-edukasi.index') }}"
+                class="bg-white rounded-2xl border border-border p-4 sm:p-5 flex items-center justify-between hover:border-green-600 hover:shadow-xs transition-all group">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-green-50 text-green-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <x-ikon nama="gamepad-2" ukuran="22" />
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-ink text-sm sm:text-base group-hover:text-green-700 transition-colors">
+                            Game Edukasi & Simulasi
+                        </h3>
+                        <p class="text-xs text-muted">Akses game interaktif untuk melatih pemahaman materi</p>
+                    </div>
+                </div>
+                <div class="text-muted group-hover:text-green-700 group-hover:translate-x-1 transition-all">
+                    <x-ikon nama="chevron-right" ukuran="20" />
+                </div>
+            </a>
+
+            <a href="{{ route('siswa.praktikalitas.index') }}"
+                class="bg-white rounded-2xl border border-border p-4 sm:p-5 flex items-center justify-between hover:border-green-600 hover:shadow-xs transition-all group">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <x-ikon nama="clipboard-check" ukuran="22" />
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-ink text-sm sm:text-base group-hover:text-emerald-700 transition-colors">
+                            Lembar Praktikalitas Media
+                        </h3>
+                        <p class="text-xs text-muted">Beri penilaian kepraktisan website untuk penelitian</p>
+                    </div>
+                </div>
+                <div class="text-muted group-hover:text-emerald-700 group-hover:translate-x-1 transition-all">
+                    <x-ikon nama="chevron-right" ukuran="20" />
+                </div>
+            </a>
+        </div>
+
         <!-- Stepper Alur Belajar (Mobile: Vertikal, Laptop: Grid / Horizontal Stepper) -->
         <div class="space-y-4">
             <div>

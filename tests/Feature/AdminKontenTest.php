@@ -204,6 +204,25 @@ class AdminKontenTest extends TestCase
         ]);
         $resPg->assertRedirect(route('admin.kuis.soal.index', $kuis));
 
+        // PG valid dengan input radio kunci_benar (misal memilih Opsi B / indeks 1)
+        $resPgB = $this->post(route('admin.kuis.soal.store', $kuis), [
+            'tipe_soal' => 'pilihan_ganda',
+            'pertanyaan' => 'Apa fungsi ribosom?',
+            'bobot_poin' => 10,
+            'kunci_benar' => '1',
+            'pilihan' => [
+                ['teks' => 'Respirasi sel'],
+                ['teks' => 'Sintesis protein'],
+                ['teks' => 'Fotosintesis'],
+            ],
+        ]);
+        $resPgB->assertRedirect(route('admin.kuis.soal.index', $kuis));
+
+        $soalRibosom = $kuis->soal()->where('pertanyaan', 'Apa fungsi ribosom?')->first();
+        $this->assertNotNull($soalRibosom);
+        $kunciBenarRibosom = $soalRibosom->pilihanJawaban()->where('apakah_benar', true)->first();
+        $this->assertEquals('Sintesis protein', $kunciBenarRibosom->teks_pilihan);
+
         // Isian tanpa kunci -> ditolak
         $this->post(route('admin.kuis.soal.store', $kuis), [
             'tipe_soal' => 'isian',

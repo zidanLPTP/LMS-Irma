@@ -84,6 +84,13 @@ Route::middleware(['auth', 'peran:siswa', 'periksa.status', 'catat.aktivitas'])-
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
     Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'tandaiSemuaDibaca'])->name('notifikasi.baca-semua');
     Route::get('/notifikasi/{notifikasi}', [NotifikasiController::class, 'buka'])->name('notifikasi.buka');
+
+    // Game Edukasi & Tautan Penting
+    Route::get('/game-edukasi', [App\Http\Controllers\Siswa\GameEdukasiController::class, 'index'])->name('game-edukasi.index');
+
+    // Lembar Praktikalitas Media
+    Route::get('/praktikalitas', [App\Http\Controllers\Siswa\PraktikalitasController::class, 'index'])->name('praktikalitas.index');
+    Route::post('/praktikalitas', [App\Http\Controllers\Siswa\PraktikalitasController::class, 'store'])->name('praktikalitas.store');
 });
 
 // Endpoint Detak Jantung (Heartbeat) - Auth (siswa dicatat, admin 204), Throttle 10 req/menit
@@ -152,6 +159,14 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
     Route::get('kuis/{kuis}/impor-soal', [ImporSoalController::class, 'create'])->name('impor-soal.create');
     Route::post('kuis/{kuis}/impor-soal/pratinjau', [ImporSoalController::class, 'pratinjau'])->middleware('throttle:20,1')->name('impor-soal.pratinjau');
     Route::post('kuis/{kuis}/impor-soal/konfirmasi', [ImporSoalController::class, 'konfirmasi'])->middleware('throttle:10,1')->name('impor-soal.konfirmasi');
+
+    // Kelola Tautan Game Edukasi
+    Route::resource('tautan-edukasi', App\Http\Controllers\Admin\TautanEdukasiController::class)->except(['show']);
+    Route::post('tautan-edukasi/{tautanEdukasi}/toggle', [App\Http\Controllers\Admin\TautanEdukasiController::class, 'toggle'])->name('tautan-edukasi.toggle');
+
+    // Lembar Praktikalitas Media
+    Route::get('praktikalitas', [App\Http\Controllers\Admin\PraktikalitasController::class, 'index'])->name('praktikalitas.index');
+    Route::get('praktikalitas/ekspor', [App\Http\Controllers\Admin\PraktikalitasController::class, 'ekspor'])->middleware('throttle:15,1')->name('praktikalitas.ekspor');
 
     // Mode Pratinjau Sebagai Siswa oleh Admin
     Route::prefix('pratinjau')->name('pratinjau.')->group(function () {

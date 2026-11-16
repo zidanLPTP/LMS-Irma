@@ -56,10 +56,14 @@
                 <!-- Bagian Opsi Pilihan Ganda -->
                 <div x-show="tipeSoal === 'pilihan_ganda'" class="space-y-3 pt-2 border-t border-border">
                     <span class="block text-sm font-bold text-ink">Opsi Pilihan Jawaban (Minimal 2 opsi, pilih TEPAT SATU yang benar)</span>
+                    <p class="text-xs text-muted">Klik bulatan opsi di sebelah kiri untuk menandai pilihan yang merupakan kunci jawaban benar.</p>
                     @for ($i = 0; $i < 4; $i++)
                         <div class="flex items-center gap-3">
-                            <input type="radio" name="pilihan[{{ $i }}][apakah_benar]" value="1" {{ old("pilihan.{$i}.apakah_benar") ? 'checked' : ($i === 0 ? 'checked' : '') }}
-                                class="text-green-700 focus:ring-green-700 cursor-pointer" title="Tandai sebagai jawaban benar">
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer bg-surface hover:bg-green-50 px-2.5 py-2 rounded-xl border border-border transition-colors">
+                                <input type="radio" name="kunci_benar" value="{{ $i }}" {{ (string) old('kunci_benar', '0') === (string) $i ? 'checked' : '' }}
+                                    class="text-green-700 focus:ring-green-700 cursor-pointer" title="Tandai sebagai jawaban benar">
+                                <span class="font-extrabold text-xs text-ink">{{ chr(65 + $i) }}</span>
+                            </label>
                             <input type="text" name="pilihan[{{ $i }}][teks]" value="{{ old("pilihan.{$i}.teks") }}" placeholder="Teks opsi {{ chr(65 + $i) }}"
                                 class="flex-1 rounded-xl border border-border px-3.5 py-2 text-ink bg-white focus:outline-none focus:ring-2 focus:ring-green-700 text-sm">
                         </div>
