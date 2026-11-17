@@ -72,11 +72,23 @@
 
                 <!-- Bagian Kunci Isian Singkat -->
                 <div x-show="tipeSoal === 'isian'" class="space-y-3 pt-2 border-t border-border">
-                    <span class="block text-sm font-bold text-ink">Kunci Jawaban Isian Singkat (Minimal 1 kunci, boleh beberapa variasi)</span>
-                    <p class="text-xs text-muted">Sistem otomatis mencocokkan tanpa membedakan huruf besar/kecil dan spasi ganda.</p>
+                    <div>
+                        <span class="block text-sm font-bold text-ink">Kunci Jawaban Isian Singkat</span>
+                        <p class="text-xs text-muted mt-0.5">Siswa cukup menjawab <strong>salah satu</strong> variasi yang cocok untuk memperoleh nilai penuh (sistem otomatis mengabaikan huruf kapital dan tanda baca akhir).</p>
+                    </div>
+
+                    <div class="p-3 bg-sky-50 rounded-xl border border-sky-200 text-xs text-sky-900 space-y-1">
+                        <span class="font-bold flex items-center gap-1.5">
+                            <x-ikon nama="info" ukuran="15" />
+                            Petunjuk Pengisian Variasi:
+                        </span>
+                        <p>3 kotak di bawah adalah pilihan <em>sinonim/alternatif penulisan</em> dari 1 jawaban yang sama. Contoh: Kotak 1: <code class="bg-white px-1 py-0.5 rounded text-sky-800 font-mono">Mitosis</code>, Kotak 2: <code class="bg-white px-1 py-0.5 rounded text-sky-800 font-mono">Pembelahan mitosis</code>. Jika soal Anda meminta siswa menyebutkan beberapa hal sekaligus, gunakan tipe <strong>Esai</strong>.</p>
+                    </div>
+
                     @for ($i = 0; $i < 3; $i++)
                         <div>
-                            <input type="text" name="kunci_isian[{{ $i }}]" value="{{ old("kunci_isian.{$i}") }}" placeholder="Variasi kunci jawaban yang benar {{ $i + 1 }}"
+                            <label class="block text-[11px] font-bold text-muted mb-1">Variasi Jawaban Benar {{ $i + 1 }} {{ $i === 0 ? '(Wajib)' : '(Opsional)' }}</label>
+                            <input type="text" name="kunci_isian[{{ $i }}]" value="{{ old("kunci_isian.{$i}") }}" placeholder="Contoh: {{ $i === 0 ? 'Mitosis' : ($i === 1 ? 'Pembelahan mitosis' : 'Fase mitosis') }}"
                                 class="w-full rounded-xl border border-border px-3.5 py-2 text-ink bg-white focus:outline-none focus:ring-2 focus:ring-sky-700 text-sm">
                         </div>
                     @endfor

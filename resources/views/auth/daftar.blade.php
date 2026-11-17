@@ -1,6 +1,11 @@
 <x-layouts.induk judul="Daftar Akun Siswa">
     <div class="max-w-md mx-auto">
-        <x-kartu class="p-6 sm:p-8">
+        <x-kartu class="relative overflow-hidden p-6 sm:p-8">
+            <!-- Ornamen Biologi Halus di Pojok Kartu Daftar -->
+            <div class="absolute -right-6 -bottom-6 w-32 h-32 pointer-events-none select-none opacity-[0.06] text-green-700">
+                <img src="{{ asset('gambar/ornamen/ornamen-mikroskop.svg') }}" alt="" class="w-full h-full">
+            </div>
+            <div class="relative z-10">
             @php
                 $namaSitusApp = \App\Models\Pengaturan::ambil('nama_situs', config('app.name', 'BioSTEMX'));
                 $logoSitusApp = \App\Models\Pengaturan::ambil('logo_situs', 'gambar/logo_biostemx.png');
@@ -99,6 +104,7 @@
             <div class="mt-6 text-center text-sm text-muted">
                 Sudah punya akun?
                 <a href="{{ route('masuk') }}" class="font-bold text-green-700 hover:underline">Masuk di sini</a>
+            </div>
             </div>
         </x-kartu>
     </div>

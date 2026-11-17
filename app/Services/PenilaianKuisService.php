@@ -231,17 +231,30 @@ class PenilaianKuisService
                 if ($pilihan && (int) $pilihan->soal_id === (int) $soal->id && $pilihan->apakah_benar) {
                     $poin = (float) $soal->bobot_poin;
                 }
-            } elseif ($soal->tipe_soal === 'isian' && ! empty($teks)) {
-                $teksNormal = $this->normalisasiTeksIsian($teks);
+            } elseif ($soal->tipe_soal === 'isian' && ! empty(trim((string) $teks))) {
+                $teksNormal = $this->normalisasiTeksIsian((string) $teks);
                 $kunciBenar = $soal->pilihanJawaban()
                     ->where('apakah_benar', true)
                     ->pluck('teks_pilihan')
                     ->all();
 
                 foreach ($kunciBenar as $kunci) {
-                    if ($this->normalisasiTeksIsian($kunci) === $teksNormal) {
+                    $kunciNormal = $this->normalisasiTeksIsian((string) $kunci);
+
+                    if ($kunciNormal !== '' && $kunciNormal === $teksNormal) {
                         $poin = (float) $soal->bobot_poin;
                         break;
+                    }
+
+                    // Antisipasi bila admin menulis beberapa alternatif variasi dipisahkan tanda koma, titik-koma, atau garis miring
+                    $pecahanKunci = preg_split('/[,;\/|]/', (string) $kunci);
+                    if ($pecahanKunci && count($pecahanKunci) > 1) {
+                        foreach ($pecahanKunci as $pk) {
+                            if ($this->normalisasiTeksIsian($pk) === $teksNormal && $teksNormal !== '') {
+                                $poin = (float) $soal->bobot_poin;
+                                break 2;
+                            }
+                        }
                     }
                 }
             }
@@ -506,11 +519,19 @@ class PenilaianKuisService
     }
 
     /**
-     * Normalisasi teks isian: trim, lowercase, rapatkan spasi ganda di tengah.
+     * Normalisasi teks isian: bersihkan karakter tak terlihat, lowercase,
+     * pangkas tanda baca luar (titik/koma/kutip di akhir), dan rapatkan spasi ganda.
      */
     protected function normalisasiTeksIsian(string $teks): string
     {
+        // Bersihkan zero-width space dan karakter tak terlihat
+        $teks = preg_replace('/[\x{200B}-\x{200D}\x{FEFF}]/u', '', $teks) ?? $teks;
+
+        // Lowercase & trim spasi
         $teks = mb_strtolower(trim($teks));
+
+        // Pangkas tanda baca di tepi teks (misal: "mitosis." -> "mitosis")
+        $teks = trim($teks, " \t\n\r\0\x0B.,?!'\"`~;:()[]{}");
 
         return preg_replace('/\s+/', ' ', $teks) ?? $teks;
     }

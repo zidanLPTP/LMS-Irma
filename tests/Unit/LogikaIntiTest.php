@@ -208,6 +208,19 @@ class LogikaIntiTest extends TestCase
         $jawaban = $this->penilaianService->simpanJawaban($percobaan, $soal, ['jawaban_teks' => '  Badan   Mitokondria  ']);
 
         $this->assertEquals(10.00, $jawaban->poin_diperoleh);
+
+        // Uji normalisasi tanda baca titik di akhir kata: "mitokondria."
+        $percobaan2 = PercobaanKuis::create([
+            'kuis_id' => $kuis->id,
+            'user_id' => $siswa->id,
+            'nomor_percobaan' => 2,
+            'waktu_mulai' => now(),
+            'status_pengerjaan' => 'sedang_mengerjakan',
+            'urutan_soal_teracak' => [$soal->id],
+        ]);
+        $this->penilaianService->mulaiSoal($percobaan2, $soal);
+        $jawaban2 = $this->penilaianService->simpanJawaban($percobaan2, $soal, ['jawaban_teks' => 'Mitokondria.']);
+        $this->assertEquals(10.00, $jawaban2->poin_diperoleh);
     }
 
     public function test_validasi_timer_server_jawaban_lewat_batas_waktu_dikosongkan_dan_esai_bebas_timer(): void

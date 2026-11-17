@@ -1,17 +1,22 @@
 <x-layouts.siswa judul="Game Edukasi & Media">
     <div class="space-y-6">
         <!-- Header Halaman -->
-        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200/80 p-6 sm:p-8 space-y-3">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-white text-green-700 border border-green-200 shadow-xs">
-                <x-ikon nama="gamepad-2" ukuran="15" />
-                Media Interaktif Pembelajaran
-            </span>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
-                Game Edukasi & Media Belajar
-            </h1>
-            <p class="text-sm text-muted max-w-2xl leading-relaxed">
-                Asah pemahaman biologi Anda melalui berbagai simulasi interaktif, kuis game edukatif, dan aktivitas menarik berikut. Klik tombol untuk memainkan langsung di peramban Anda!
-            </p>
+        <div class="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200/80 p-6 sm:p-8 space-y-3">
+            <div class="absolute -right-6 -bottom-8 w-40 h-40 pointer-events-none select-none opacity-[0.12] text-green-700 hidden sm:block">
+                <img src="{{ asset('gambar/ornamen/ornamen-mikroskop.svg') }}" alt="" class="w-full h-full">
+            </div>
+            <div class="relative z-10 space-y-3">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-white text-green-700 border border-green-200 shadow-xs">
+                    <x-ikon nama="gamepad-2" ukuran="15" />
+                    Media Interaktif Pembelajaran
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
+                    Game Edukasi & Media Belajar
+                </h1>
+                <p class="text-sm text-muted max-w-2xl leading-relaxed">
+                    Asah pemahaman biologi Anda melalui berbagai simulasi interaktif, kuis game edukatif, dan aktivitas menarik berikut. Klik tombol untuk memainkan langsung di peramban Anda!
+                </p>
+            </div>
         </div>
 
         @if ($tautan->isEmpty())
