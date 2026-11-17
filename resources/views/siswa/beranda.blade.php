@@ -1,16 +1,8 @@
 <x-layouts.siswa judul="Beranda Pembelajaran">
     <div class="space-y-8">
         <!-- Kartu Sambutan & Ringkasan Progres -->
-        <x-kartu class="relative overflow-hidden p-6 sm:p-8 bg-white border border-border">
-            <!-- Ornamen Biologi Garis Monokrom (Watermark Halus) -->
-            <div class="absolute -right-8 -bottom-10 w-48 h-48 text-green-700 pointer-events-none select-none hidden sm:block opacity-[0.10]">
-                <img src="{{ asset('gambar/ornamen/ornamen-dna.svg') }}" alt="" class="w-full h-full">
-            </div>
-            <div class="absolute right-48 -top-12 w-32 h-32 text-green-700 pointer-events-none select-none hidden md:block opacity-[0.08]">
-                <img src="{{ asset('gambar/ornamen/ornamen-sel.svg') }}" alt="" class="w-full h-full">
-            </div>
-
-            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <x-kartu class="p-6 sm:p-8 bg-white border border-border">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="space-y-2">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-green-50 text-green-700 border border-green-200">
                         <x-ikon nama="leaf" ukuran="14" />
@@ -154,11 +146,8 @@
         <!-- Menu Aktivitas Pendukung (Game Edukasi & Lembar Praktikalitas) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <a href="{{ route('siswa.game-edukasi.index') }}"
-                class="relative overflow-hidden bg-white rounded-2xl border border-border p-4 sm:p-5 flex items-center justify-between hover:border-green-600 hover:shadow-xs transition-all group">
-                <div class="absolute -right-4 -bottom-6 w-24 h-24 pointer-events-none select-none opacity-[0.08] text-green-700">
-                    <img src="{{ asset('gambar/ornamen/ornamen-mikroskop.svg') }}" alt="" class="w-full h-full">
-                </div>
-                <div class="relative z-10 flex items-center gap-3.5">
+                class="bg-white rounded-2xl border border-border p-4 sm:p-5 flex items-center justify-between hover:border-green-600 hover:shadow-xs transition-all group">
+                <div class="flex items-center gap-3.5">
                     <div class="w-11 h-11 rounded-xl bg-green-50 text-green-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                         <x-ikon nama="gamepad-2" ukuran="22" />
                     </div>
@@ -169,17 +158,14 @@
                         <p class="text-xs text-muted">Akses game interaktif untuk melatih pemahaman materi</p>
                     </div>
                 </div>
-                <div class="relative z-10 text-muted group-hover:text-green-700 group-hover:translate-x-1 transition-all">
+                <div class="text-muted group-hover:text-green-700 group-hover:translate-x-1 transition-all">
                     <x-ikon nama="chevron-right" ukuran="20" />
                 </div>
             </a>
 
             <a href="{{ route('siswa.praktikalitas.index') }}"
-                class="relative overflow-hidden bg-white rounded-2xl border border-border p-4 sm:p-5 flex items-center justify-between hover:border-green-600 hover:shadow-xs transition-all group">
-                <div class="absolute -right-4 -bottom-6 w-24 h-24 pointer-events-none select-none opacity-[0.08] text-green-700">
-                    <img src="{{ asset('gambar/ornamen/ornamen-sel.svg') }}" alt="" class="w-full h-full">
-                </div>
-                <div class="relative z-10 flex items-center gap-3.5">
+                class="bg-white rounded-2xl border border-border p-4 sm:p-5 flex items-center justify-between hover:border-green-600 hover:shadow-xs transition-all group">
+                <div class="flex items-center gap-3.5">
                     <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                         <x-ikon nama="clipboard-check" ukuran="22" />
                     </div>
@@ -190,7 +176,7 @@
                         <p class="text-xs text-muted">Beri penilaian kepraktisan website untuk penelitian</p>
                     </div>
                 </div>
-                <div class="relative z-10 text-muted group-hover:text-emerald-700 group-hover:translate-x-1 transition-all">
+                <div class="text-muted group-hover:text-emerald-700 group-hover:translate-x-1 transition-all">
                     <x-ikon nama="chevron-right" ukuran="20" />
                 </div>
             </a>

@@ -79,24 +79,20 @@
             </div>
         @else
             <!-- Formulir Pengisian Lembar Praktikalitas -->
-            <div class="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200/80 p-6 sm:p-8 space-y-3">
-                <div class="absolute -right-8 -bottom-10 w-44 h-44 pointer-events-none select-none opacity-[0.10] text-green-700 hidden sm:block">
-                    <img src="{{ asset('gambar/ornamen/ornamen-dna.svg') }}" alt="" class="w-full h-full">
-                </div>
-                <div class="relative z-10 space-y-3">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-white text-green-700 border border-green-200 shadow-xs">
-                        <x-ikon nama="clipboard-list" ukuran="15" />
-                        Instrumen Penelitian Praktikalitas Media
-                    </span>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
-                        Lembar Praktikalitas Penggunaan Website
-                    </h1>
-                    <p class="text-sm text-muted max-w-2xl leading-relaxed">
-                        Mohon berikan penilaian sejujurnya mengenai kemudahan, kenyamanan, dan kebermanfaatan website BioSTEM-X ini selama Anda belajar. Penilaian Anda tidak mempengaruhi nilai akademik.
-                    </p>
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200/80 p-6 sm:p-8 space-y-3">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-white text-green-700 border border-green-200 shadow-xs">
+                    <x-ikon nama="clipboard-list" ukuran="15" />
+                    Instrumen Penelitian Praktikalitas Media
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
+                    Lembar Praktikalitas Penggunaan Website
+                </h1>
+                <p class="text-sm text-muted max-w-2xl leading-relaxed">
+                    Mohon berikan penilaian sejujurnya mengenai kemudahan, kenyamanan, dan kebermanfaatan website BioSTEM-X ini selama Anda belajar. Penilaian Anda tidak mempengaruhi nilai akademik.
+                </p>
 
-                    <!-- Keterangan Skala -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-xs">
+                <!-- Keterangan Skala -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-xs">
                     <div class="bg-white/80 backdrop-blur rounded-xl p-2.5 border border-green-200 text-center">
                         <span class="block font-black text-green-800 text-sm">4</span>
                         <span class="text-[11px] text-muted font-bold">Sangat Setuju (SS)</span>
