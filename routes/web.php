@@ -32,8 +32,14 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Halaman utama diarahkan ke masuk
+// Halaman utama diarahkan sesuai status autentikasi
 Route::get('/', function () {
+    if (auth()->check()) {
+        return auth()->user()->isAdmin()
+            ? redirect()->route('admin.beranda')
+            : redirect()->route('siswa.beranda');
+    }
+
     return redirect()->route('masuk');
 });
 

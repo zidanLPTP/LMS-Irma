@@ -18,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+
         $middleware->web(append: [
             HeaderKeamanan::class,
         ]);
@@ -27,7 +29,17 @@ return Application::configure(basePath: dirname(__DIR__))
             'catat.aktivitas' => CatatAktivitas::class,
             'periksa.status' => PeriksaAkunAktifDanPassword::class,
         ]);
+
         $middleware->redirectGuestsTo(fn () => route('masuk'));
+        $middleware->redirectUsersTo(function () {
+            if (auth()->check()) {
+                return auth()->user()->isAdmin()
+                    ? route('admin.beranda')
+                    : route('siswa.beranda');
+            }
+
+            return route('masuk');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $simpanTujuanKuis = function (Request $request): void {
