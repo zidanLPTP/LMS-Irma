@@ -168,4 +168,66 @@ class KoreksiIsianDanResetKuisTest extends TestCase
         $this->assertDatabaseMissing('percobaan_kuis', ['id' => $percobaan->id]);
         $this->assertDatabaseCount('jawaban_siswa', 0);
     }
+
+    public function test_pencocokan_cerdas_isian_singkat_saat_siswa_menjawab_kalimat_panjang(): void
+    {
+        $kuis = Kuis::create([
+            'tipe_kuis' => 'kuis_bab',
+            'judul' => 'Kuis Cerdas Isian',
+            'nilai_lulus' => 65.00,
+        ]);
+
+        $soal = Soal::create([
+            'kuis_id' => $kuis->id,
+            'tipe_soal' => 'isian',
+            'pertanyaan' => 'Organel penghasil energi sel adalah?',
+            'bobot_poin' => 10,
+            'urutan' => 1,
+        ]);
+
+        PilihanJawaban::create([
+            'soal_id' => $soal->id,
+            'teks_pilihan' => 'mitokondria',
+            'apakah_benar' => true,
+            'urutan' => 1,
+        ]);
+
+        $soal2 = Soal::create([
+            'kuis_id' => $kuis->id,
+            'tipe_soal' => 'isian',
+            'pertanyaan' => 'Organel pembentuk protein adalah?',
+            'bobot_poin' => 10,
+            'urutan' => 2,
+        ]);
+
+        PilihanJawaban::create([
+            'soal_id' => $soal2->id,
+            'teks_pilihan' => 'ribosom',
+            'apakah_benar' => true,
+            'urutan' => 1,
+        ]);
+
+        $percobaan = PercobaanKuis::create([
+            'user_id' => $this->siswa->id,
+            'kuis_id' => $kuis->id,
+            'nomor_percobaan' => 1,
+            'urutan_soal_teracak' => [$soal->id, $soal2->id],
+            'waktu_mulai' => now()->subMinutes(5),
+            'status_pengerjaan' => 'sedang_mengerjakan',
+        ]);
+
+        // Siswa menjawab 1 kalimat penuh dengan kata kunci 'mitokondria' di dalamnya
+        $jawaban = $this->penilaianService->simpanJawaban($percobaan, $soal, [
+            'jawaban_teks' => 'Organel yang berfungsi menghasilkan energi adalah mitokondria.',
+        ]);
+
+        // Harus otomatis dinilai benar (10 poin)
+        $this->assertEquals(10.00, (float) $jawaban->poin_diperoleh);
+
+        // Uji coba untuk soal kedua dengan jawaban yang salah (tidak mengandung kata kunci)
+        $jawabanSalah = $this->penilaianService->simpanJawaban($percobaan, $soal2, [
+            'jawaban_teks' => 'Jawabannya adalah mitokondria.',
+        ]);
+        $this->assertEquals(0.00, (float) $jawabanSalah->poin_diperoleh);
+    }
 }

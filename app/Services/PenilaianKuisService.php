@@ -252,18 +252,40 @@ class PenilaianKuisService
                 foreach ($kunciBenar as $kunci) {
                     $kunciNormal = $this->normalisasiTeksIsian((string) $kunci);
 
+                    // 1. Pencocokan Persis (Exact Match)
                     if ($kunciNormal !== '' && $kunciNormal === $teksNormal) {
                         $poin = (float) $soal->bobot_poin;
                         break;
                     }
 
-                    // Antisipasi bila admin menulis beberapa alternatif variasi dipisahkan tanda koma, titik-koma, atau garis miring
+                    // 2. Pencocokan Cerdas Kata Utuh (Word Boundary) jika siswa menjawab dalam 1 kalimat panjang
+                    // Contoh: Kunci "mitokondria", siswa mengetik "organel respirasi adalah mitokondria"
+                    if ($kunciNormal !== '' && mb_strlen($kunciNormal) >= 3) {
+                        $pola = '/(?:\b|^)'.preg_quote($kunciNormal, '/').'(?:\b|$)/ui';
+                        if (preg_match($pola, $teksNormal)) {
+                            $poin = (float) $soal->bobot_poin;
+                            break;
+                        }
+                    }
+
+                    // 3. Antisipasi bila admin menulis beberapa alternatif variasi dipisahkan koma, titik-koma, atau garis miring
                     $pecahanKunci = preg_split('/[,;\/|]/', (string) $kunci);
                     if ($pecahanKunci && count($pecahanKunci) > 1) {
                         foreach ($pecahanKunci as $pk) {
-                            if ($this->normalisasiTeksIsian($pk) === $teksNormal && $teksNormal !== '') {
-                                $poin = (float) $soal->bobot_poin;
-                                break 2;
+                            $pkNormal = $this->normalisasiTeksIsian($pk);
+                            if ($pkNormal !== '') {
+                                if ($pkNormal === $teksNormal) {
+                                    $poin = (float) $soal->bobot_poin;
+                                    break 2;
+                                }
+
+                                if (mb_strlen($pkNormal) >= 3) {
+                                    $pola = '/(?:\b|^)'.preg_quote($pkNormal, '/').'(?:\b|$)/ui';
+                                    if (preg_match($pola, $teksNormal)) {
+                                        $poin = (float) $soal->bobot_poin;
+                                        break 2;
+                                    }
+                                }
                             }
                         }
                     }
