@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\KuisRequest;
 use App\Models\Bab;
+use App\Models\JawabanSiswa;
 use App\Models\Kuis;
 use App\Models\Pengaturan;
+use App\Models\RiwayatNilaiEsai;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class KuisController extends Controller
@@ -100,5 +103,33 @@ class KuisController extends Controller
         $kuis->delete();
 
         return redirect()->route('admin.kuis.index')->with('sukses', 'Kuis berhasil dihapus.');
+    }
+
+    /**
+     * Reset riwayat pengerjaan kuis siswa (hapus semua percobaan & jawaban).
+     * Berguna bila admin salah input soal dan ingin membersihkan kuis agar bisa diedit/dihapus kembali.
+     */
+    public function resetPengerjaan(Request $request, Kuis $kuis): RedirectResponse
+    {
+        abort_unless($request->user()?->isAdmin(), 403);
+
+        DB::transaction(function () use ($kuis) {
+            $percobaanIds = $kuis->percobaan()->pluck('id');
+
+            // Hapus riwayat penilaian esai
+            RiwayatNilaiEsai::whereIn(
+                'jawaban_siswa_id',
+                JawabanSiswa::whereIn('percobaan_kuis_id', $percobaanIds)->pluck('id')
+            )->delete();
+
+            // Hapus jawaban siswa
+            JawabanSiswa::whereIn('percobaan_kuis_id', $percobaanIds)->delete();
+
+            // Hapus percobaan kuis
+            $kuis->percobaan()->delete();
+        });
+
+        return redirect()->route('admin.kuis.index')
+            ->with('sukses', "Riwayat pengerjaan kuis '{$kuis->judul}' berhasil dibersihkan. Kuis dan butir soal sekarang sudah bebas diedit atau dihapus kembali.");
     }
 }

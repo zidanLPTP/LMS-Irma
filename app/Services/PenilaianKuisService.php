@@ -238,6 +238,17 @@ class PenilaianKuisService
                     ->pluck('teks_pilihan')
                     ->all();
 
+                // Fallback jika soal diimpor dari Excel versi lama yang menyimpan kunci di kolom soal.kunci_jawaban
+                if (empty($kunciBenar) && ! empty($soal->kunci_jawaban)) {
+                    $kunciRaw = $soal->kunci_jawaban;
+                    if (is_string($kunciRaw)) {
+                        $decoded = json_decode($kunciRaw, true);
+                        $kunciBenar = is_array($decoded) ? $decoded : [$kunciRaw];
+                    } elseif (is_array($kunciRaw)) {
+                        $kunciBenar = $kunciRaw;
+                    }
+                }
+
                 foreach ($kunciBenar as $kunci) {
                     $kunciNormal = $this->normalisasiTeksIsian((string) $kunci);
 
@@ -483,6 +494,84 @@ class PenilaianKuisService
                     // Jangan gagalkan transaksi penilaian jika notifikasi gagal
                 }
             }
+
+            return $jawaban;
+        });
+    }
+
+    /**
+     * Koreksi manual nilai isian singkat oleh admin Irma dan hitung ulang nilai kuis.
+     */
+    public function koreksiNilaiIsian(JawabanSiswa $jawaban, float $poinBaru, ?User $admin = null): JawabanSiswa
+    {
+        $soal = $jawaban->soal;
+        if (! $soal || $soal->tipe_soal !== 'isian') {
+            throw new InvalidArgumentException('Jawaban ini bukan bertipe isian singkat.');
+        }
+
+        $bobotMaksimal = (float) $soal->bobot_poin;
+        if ($poinBaru < 0 || $poinBaru > $bobotMaksimal) {
+            throw new InvalidArgumentException("Poin harus berada di antara 0 dan {$bobotMaksimal}.");
+        }
+
+        return DB::transaction(function () use ($jawaban, $poinBaru) {
+            $jawaban->update([
+                'poin_diperoleh' => $poinBaru,
+                'dinilai_pada' => now(),
+            ]);
+
+            $percobaan = $jawaban->percobaanKuis;
+            $kuis = $percobaan->kuis;
+
+            // Hitung ulang total poin otomatis & total semua bobot
+            $semuaSoal = $kuis->soal;
+            $totalBobotOtomatis = 0;
+            $totalPoinOtomatis = 0.00;
+            $totalBobotSemua = 0;
+            $totalPoinSemua = 0.00;
+
+            foreach ($semuaSoal as $s) {
+                $totalBobotSemua += $s->bobot_poin;
+                $j = JawabanSiswa::where('percobaan_kuis_id', $percobaan->id)
+                    ->where('soal_id', $s->id)
+                    ->first();
+
+                if ($s->dinilaiOtomatis()) {
+                    $totalBobotOtomatis += $s->bobot_poin;
+                    if ($j) {
+                        $totalPoinOtomatis += (float) $j->poin_diperoleh;
+                        $totalPoinSemua += (float) $j->poin_diperoleh;
+                    }
+                } elseif ($s->isEsai() && $j) {
+                    $totalPoinSemua += (float) $j->poin_diperoleh;
+                }
+            }
+
+            $nilaiOtomatis = $totalBobotOtomatis > 0
+                ? round(($totalPoinOtomatis / $totalBobotOtomatis) * 100, 2)
+                : 0.00;
+
+            $statusKelulusan = $percobaan->status_kelulusan;
+            if ($kuis->tipe_kuis === 'kuis_bab') {
+                $nilaiLulus = $kuis->nilaiLulusEfektif();
+                if ($nilaiOtomatis >= $nilaiLulus) {
+                    $statusKelulusan = 'lulus';
+                }
+            }
+
+            $updateData = [
+                'nilai_otomatis' => $nilaiOtomatis,
+                'status_kelulusan' => $statusKelulusan,
+            ];
+
+            // Jika tidak ada esai yang sedang menunggu penilaian admin, perbarui nilai_akhir juga
+            if (! $percobaan->esai_menunggu_nilai) {
+                $updateData['nilai_akhir'] = $totalBobotSemua > 0
+                    ? round(($totalPoinSemua / $totalBobotSemua) * 100, 2)
+                    : 0.00;
+            }
+
+            $percobaan->update($updateData);
 
             return $jawaban;
         });

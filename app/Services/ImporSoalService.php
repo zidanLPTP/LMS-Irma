@@ -204,6 +204,16 @@ class ImporSoalService
                             'urutan' => $urutanPilihan++,
                         ]);
                     }
+                } elseif ($item['tipe'] === 'isian') {
+                    $urutanPilihan = 1;
+                    foreach ($item['kunci_isian'] as $kunciTeks) {
+                        PilihanJawaban::create([
+                            'soal_id' => $soal->id,
+                            'teks_pilihan' => $kunciTeks,
+                            'apakah_benar' => true,
+                            'urutan' => $urutanPilihan++,
+                        ]);
+                    }
                 }
 
                 $jumlahDitambahkan++;

@@ -98,6 +98,10 @@
                     </span>
                 @endif
             </a>
+            <a href="{{ route('admin.koreksi-isian.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.koreksi-isian.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                <x-ikon nama="file-edit" ukuran="18" />
+                <span>Koreksi Isian</span>
+            </a>
             <div class="pt-2 border-t border-border mt-2">
                 <span class="block px-3 py-1 text-xs font-extrabold text-muted uppercase tracking-wider">Pengguna</span>
                 <a href="{{ route('admin.pengguna.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.pengguna.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
@@ -154,6 +158,10 @@
                             {{ $jumlahAntreanEsai }}
                         </span>
                     @endif
+                </a>
+                <a href="{{ route('admin.koreksi-isian.index') }}" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors {{ request()->routeIs('admin.koreksi-isian.*') ? 'bg-green-100 text-green-700' : 'text-ink hover:bg-green-50' }}">
+                    <x-ikon nama="file-edit" ukuran="20" />
+                    <span>Koreksi Isian</span>
                 </a>
             </div>
 

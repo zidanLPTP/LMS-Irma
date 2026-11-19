@@ -74,9 +74,14 @@
                                     <a href="{{ route('admin.kuis.soal.index', $kuis) }}" class="font-bold text-green-700 hover:underline">
                                         {{ $kuis->soal_count }} Butir
                                     </a>
+                                    @if ($kuis->percobaan_count > 0)
+                                        <span class="inline-block px-1.5 py-0.5 mt-1 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+                                            {{ $kuis->percobaan_count }} Dikerjakan
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end gap-2">
+                                    <div class="flex items-center justify-end gap-2 flex-wrap">
                                         <x-tombol tipe="garis" href="{{ route('admin.pratinjau.kuis', $kuis) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs text-amber-800 border-amber-300 hover:bg-amber-50">
                                             <x-ikon nama="eye" ukuran="14" />
                                             <span>Pratinjau</span>
@@ -88,6 +93,15 @@
                                             <x-ikon nama="pencil" ukuran="14" />
                                             <span>Ubah</span>
                                         </x-tombol>
+                                        @if ($kuis->percobaan_count > 0)
+                                            <form method="POST" action="{{ route('admin.kuis.reset-pengerjaan', $kuis) }}" data-konfirmasi="PENTING: Kuis ini memiliki {{ $kuis->percobaan_count }} riwayat pengerjaan siswa. Apakah Anda yakin ingin MERESET (menghapus semua jawaban & percobaan) kuis ini? Tindakan ini akan mengosongkan riwayat pengerjaan agar kuis/soal bisa diedit atau dihapus kembali." data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Reset Pengerjaan" class="inline">
+                                                @csrf
+                                                <x-tombol tipe="bahaya" class="!min-h-[32px] !px-2.5 !py-1 text-xs !bg-amber-600 !border-amber-600 hover:!bg-amber-700" type="submit" title="Reset semua pengerjaan siswa agar kuis/soal bisa diedit/dihapus">
+                                                    <x-ikon nama="rotate-ccw" ukuran="14" />
+                                                    <span>Reset</span>
+                                                </x-tombol>
+                                            </form>
+                                        @endif
                                         <form method="POST" action="{{ route('admin.kuis.destroy', $kuis) }}" data-konfirmasi="Apakah Anda yakin ingin menghapus kuis ini?" data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Hapus" class="inline">
                                             @csrf
                                             @method('DELETE')
