@@ -11,8 +11,8 @@
             </x-tombol>
         </div>
 
-        <x-kartu class="p-0 overflow-hidden">
-            <div class="overflow-x-auto">
+        <x-kartu class="p-0 overflow-visible">
+            <div class="overflow-x-auto min-h-[300px] pb-12">
                 <table class="w-full text-left text-sm">
                     <thead class="bg-green-100 text-ink font-bold border-b border-border">
                         <tr>
@@ -81,36 +81,80 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end gap-2 flex-wrap">
-                                        <x-tombol tipe="utama" href="{{ route('admin.kuis.soal.index', $kuis) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <!-- 1. Aksi Utama: Kelola Soal -->
+                                        <x-tombol tipe="utama" href="{{ route('admin.kuis.soal.index', $kuis) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs shrink-0">
                                             <x-ikon nama="clipboard-list" ukuran="14" />
                                             <span>Kelola Soal</span>
                                         </x-tombol>
-                                        <x-tombol tipe="garis" href="{{ route('admin.pratinjau.kuis', $kuis) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs text-amber-800 border-amber-300 hover:bg-amber-50">
+
+                                        <!-- 2. Aksi Utama: Pratinjau Kuis -->
+                                        <x-tombol tipe="garis" href="{{ route('admin.pratinjau.kuis', $kuis) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs text-amber-800 border-amber-300 hover:bg-amber-50 shrink-0">
                                             <x-ikon nama="eye" ukuran="14" />
                                             <span>Pratinjau</span>
                                         </x-tombol>
-                                        <x-tombol tipe="garis" href="{{ route('admin.kuis.edit', $kuis) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs">
-                                            <x-ikon nama="pencil" ukuran="14" />
-                                            <span>Ubah</span>
-                                        </x-tombol>
-                                        @if ($kuis->percobaan_count > 0)
-                                            <form method="POST" action="{{ route('admin.kuis.reset-pengerjaan', $kuis) }}" data-konfirmasi="PENTING: Kuis ini memiliki {{ $kuis->percobaan_count }} riwayat pengerjaan siswa. Apakah Anda yakin ingin MERESET (menghapus semua jawaban & percobaan) kuis ini? Tindakan ini akan mengosongkan riwayat pengerjaan agar kuis/soal bisa diedit atau dihapus kembali." data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Reset Pengerjaan" class="inline">
-                                                @csrf
-                                                <x-tombol tipe="bahaya" class="!min-h-[32px] !px-2.5 !py-1 text-xs !bg-amber-600 !border-amber-600 hover:!bg-amber-700" type="submit" title="Reset semua pengerjaan siswa agar kuis/soal bisa diedit/dihapus">
-                                                    <x-ikon nama="rotate-ccw" ukuran="14" />
-                                                    <span>Reset</span>
-                                                </x-tombol>
-                                            </form>
-                                        @endif
-                                        <form method="POST" action="{{ route('admin.kuis.destroy', $kuis) }}" data-konfirmasi="Apakah Anda yakin ingin menghapus kuis ini?" data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Hapus" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <x-tombol tipe="bahaya" class="!min-h-[32px] !px-2.5 !py-1 text-xs" type="submit">
-                                                <x-ikon nama="trash-2" ukuran="14" />
-                                                <span>Hapus</span>
-                                            </x-tombol>
-                                        </form>
+
+                                        <!-- 3. Dropdown Popover: Aksi Lainnya (Ubah, Reset, Hapus) -->
+                                        <div class="relative inline-block text-left" x-data="{ buka: false }" @click.outside="buka = false" @keydown.escape.window="buka = false">
+                                            <button @click="buka = !buka"
+                                                    type="button"
+                                                    class="inline-flex items-center justify-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-bold border border-border bg-white text-muted hover:text-ink hover:bg-surface transition-colors min-h-[32px] cursor-pointer shrink-0"
+                                                    title="Menu Aksi Tambahan"
+                                                    :aria-expanded="buka">
+                                                <span>Lainnya</span>
+                                                <x-ikon nama="chevron-down" ukuran="13" class="transition-transform duration-200" ::class="buka ? 'rotate-180' : ''" />
+                                            </button>
+
+                                            <!-- Menu Popover Dropdown -->
+                                            <div x-show="buka"
+                                                 x-transition:enter="transition ease-out duration-100"
+                                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                                 x-transition:leave="transition ease-in duration-75"
+                                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                                 x-cloak
+                                                 class="absolute right-0 z-50 mt-1.5 w-52 rounded-xl bg-white p-1.5 shadow-[0_8px_24px_rgba(31,45,42,0.12)] border border-border/80 text-xs focus:outline-none text-left">
+
+                                                <!-- Ubah Pengaturan Kuis -->
+                                                <a href="{{ route('admin.kuis.edit', $kuis) }}"
+                                                   class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-ink hover:bg-[#F0FAF4] hover:text-green-800 font-semibold transition-colors">
+                                                    <x-ikon nama="pencil" ukuran="14" class="text-muted" />
+                                                    <span>Ubah Kuis</span>
+                                                </a>
+
+                                                <!-- Reset Pengerjaan Siswa (Hanya jika kuis memiliki pengerjaan) -->
+                                                @if ($kuis->percobaan_count > 0)
+                                                    <form method="POST" action="{{ route('admin.kuis.reset-pengerjaan', $kuis) }}"
+                                                          data-konfirmasi="PENTING: Kuis ini memiliki {{ $kuis->percobaan_count }} riwayat pengerjaan siswa. Apakah Anda yakin ingin MERESET (menghapus semua jawaban & percobaan) kuis ini? Tindakan ini akan mengosongkan riwayat pengerjaan agar kuis/soal bisa diedit atau dihapus kembali."
+                                                          data-konfirmasi-bahaya="true"
+                                                          data-konfirmasi-tombol="Ya, Reset Pengerjaan">
+                                                        @csrf
+                                                        <button type="submit"
+                                                                class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-amber-800 hover:bg-amber-50 font-semibold transition-colors cursor-pointer text-left">
+                                                            <x-ikon nama="rotate-ccw" ukuran="14" class="text-amber-700 shrink-0" />
+                                                            <span>Reset ({{ $kuis->percobaan_count }} siswa)</span>
+                                                        </button>
+                                                    </form>
+                                                @endif
+
+                                                <div class="my-1 border-t border-border/60"></div>
+
+                                                <!-- Hapus Kuis (Label Merah Spesifik) -->
+                                                <form method="POST" action="{{ route('admin.kuis.destroy', $kuis) }}"
+                                                      data-konfirmasi="Apakah Anda yakin ingin menghapus kuis ini?"
+                                                      data-konfirmasi-bahaya="true"
+                                                      data-konfirmasi-tombol="Ya, Hapus">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-danger hover:bg-red-50 font-semibold transition-colors cursor-pointer text-left">
+                                                        <x-ikon nama="trash-2" ukuran="14" class="text-danger shrink-0" />
+                                                        <span>Hapus Kuis</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
