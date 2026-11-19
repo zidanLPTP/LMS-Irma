@@ -81,35 +81,62 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end gap-2 flex-wrap">
-                                        <x-tombol tipe="garis" href="{{ route('admin.pratinjau.kuis', $kuis) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs text-amber-800 border-amber-300 hover:bg-amber-50">
-                                            <x-ikon nama="eye" ukuran="14" />
-                                            <span>Pratinjau</span>
-                                        </x-tombol>
-                                        <x-tombol tipe="utama" href="{{ route('admin.kuis.soal.index', $kuis) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <!-- Aksi Utama: Kelola Soal -->
+                                        <a href="{{ route('admin.kuis.soal.index', $kuis) }}"
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-700 text-white font-bold text-xs hover:bg-[#25664a] transition-colors shadow-xs shrink-0"
+                                           title="Kelola Butir Soal">
+                                            <x-ikon nama="clipboard-list" ukuran="14" />
                                             <span>Kelola Soal</span>
-                                        </x-tombol>
-                                        <x-tombol tipe="garis" href="{{ route('admin.kuis.edit', $kuis) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs">
-                                            <x-ikon nama="pencil" ukuran="14" />
-                                            <span>Ubah</span>
-                                        </x-tombol>
-                                        @if ($kuis->percobaan_count > 0)
-                                            <form method="POST" action="{{ route('admin.kuis.reset-pengerjaan', $kuis) }}" data-konfirmasi="PENTING: Kuis ini memiliki {{ $kuis->percobaan_count }} riwayat pengerjaan siswa. Apakah Anda yakin ingin MERESET (menghapus semua jawaban & percobaan) kuis ini? Tindakan ini akan mengosongkan riwayat pengerjaan agar kuis/soal bisa diedit atau dihapus kembali." data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Reset Pengerjaan" class="inline">
+                                        </a>
+
+                                        <!-- Aksi Sekunder: Icon Buttons Seragam -->
+                                        <div class="inline-flex items-center gap-1 pl-1 border-l border-border/80">
+                                            <!-- Pratinjau Kuis -->
+                                            <a href="{{ route('admin.pratinjau.kuis', $kuis) }}"
+                                               class="w-8 h-8 rounded-lg border border-border text-muted hover:text-amber-800 hover:bg-amber-50 hover:border-amber-300 flex items-center justify-center transition-colors"
+                                               title="Pratinjau Kuis Sebagai Siswa">
+                                                <x-ikon nama="eye" ukuran="15" />
+                                            </a>
+
+                                            <!-- Ubah Pengaturan Kuis -->
+                                            <a href="{{ route('admin.kuis.edit', $kuis) }}"
+                                               class="w-8 h-8 rounded-lg border border-border text-muted hover:text-green-700 hover:bg-green-50 hover:border-green-300 flex items-center justify-center transition-colors"
+                                               title="Ubah Pengaturan Kuis">
+                                                <x-ikon nama="pencil" ukuran="15" />
+                                            </a>
+
+                                            <!-- Reset Pengerjaan (Hanya jika ada siswa yang sudah mengerjakan) -->
+                                            @if ($kuis->percobaan_count > 0)
+                                                <form method="POST" action="{{ route('admin.kuis.reset-pengerjaan', $kuis) }}"
+                                                      data-konfirmasi="PENTING: Kuis ini memiliki {{ $kuis->percobaan_count }} riwayat pengerjaan siswa. Apakah Anda yakin ingin MERESET (menghapus semua jawaban & percobaan) kuis ini? Tindakan ini akan mengosongkan riwayat pengerjaan agar kuis/soal bisa diedit atau dihapus kembali."
+                                                      data-konfirmasi-bahaya="true"
+                                                      data-konfirmasi-tombol="Ya, Reset Pengerjaan"
+                                                      class="inline">
+                                                    @csrf
+                                                    <button type="submit"
+                                                            class="w-8 h-8 rounded-lg border border-amber-300 bg-amber-50/70 text-amber-800 hover:bg-amber-100 hover:text-amber-900 flex items-center justify-center transition-colors cursor-pointer"
+                                                            title="Reset Pengerjaan Siswa ({{ $kuis->percobaan_count }} selesai)">
+                                                        <x-ikon nama="rotate-ccw" ukuran="15" />
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            <!-- Hapus Kuis -->
+                                            <form method="POST" action="{{ route('admin.kuis.destroy', $kuis) }}"
+                                                  data-konfirmasi="Apakah Anda yakin ingin menghapus kuis ini?"
+                                                  data-konfirmasi-bahaya="true"
+                                                  data-konfirmasi-tombol="Ya, Hapus"
+                                                  class="inline">
                                                 @csrf
-                                                <x-tombol tipe="bahaya" class="!min-h-[32px] !px-2.5 !py-1 text-xs !bg-amber-600 !border-amber-600 hover:!bg-amber-700" type="submit" title="Reset semua pengerjaan siswa agar kuis/soal bisa diedit/dihapus">
-                                                    <x-ikon nama="rotate-ccw" ukuran="14" />
-                                                    <span>Reset</span>
-                                                </x-tombol>
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="w-8 h-8 rounded-lg border border-border text-muted hover:text-danger hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition-colors cursor-pointer"
+                                                        title="Hapus Kuis">
+                                                    <x-ikon nama="trash-2" ukuran="15" />
+                                                </button>
                                             </form>
-                                        @endif
-                                        <form method="POST" action="{{ route('admin.kuis.destroy', $kuis) }}" data-konfirmasi="Apakah Anda yakin ingin menghapus kuis ini?" data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Hapus" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <x-tombol tipe="bahaya" class="!min-h-[32px] !px-2.5 !py-1 text-xs" type="submit">
-                                                <x-ikon nama="trash-2" ukuran="14" />
-                                                <span>Hapus</span>
-                                            </x-tombol>
-                                        </form>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

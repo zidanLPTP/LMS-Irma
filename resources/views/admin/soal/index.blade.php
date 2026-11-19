@@ -106,18 +106,27 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <x-tombol tipe="garis" href="{{ route('admin.kuis.soal.edit', [$kuis, $soal]) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs">
-                                            <x-ikon nama="pencil" ukuran="14" />
-                                            <span>Ubah</span>
-                                        </x-tombol>
-                                        <form method="POST" action="{{ route('admin.kuis.soal.destroy', [$kuis, $soal]) }}" data-konfirmasi="Apakah kamu yakin ingin menghapus butir soal ini?" data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Hapus" class="inline">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <!-- Ubah Soal -->
+                                        <a href="{{ route('admin.kuis.soal.edit', [$kuis, $soal]) }}"
+                                           class="w-8 h-8 rounded-lg border border-border text-muted hover:text-green-700 hover:bg-green-50 hover:border-green-300 flex items-center justify-center transition-colors"
+                                           title="Ubah Butir Soal">
+                                            <x-ikon nama="pencil" ukuran="15" />
+                                        </a>
+
+                                        <!-- Hapus Soal -->
+                                        <form method="POST" action="{{ route('admin.kuis.soal.destroy', [$kuis, $soal]) }}"
+                                              data-konfirmasi="Apakah Anda yakin ingin menghapus butir soal ini?"
+                                              data-konfirmasi-bahaya="true"
+                                              data-konfirmasi-tombol="Ya, Hapus"
+                                              class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <x-tombol tipe="bahaya" class="!min-h-[32px] !px-2.5 !py-1 text-xs" type="submit">
-                                                <x-ikon nama="trash-2" ukuran="14" />
-                                                <span>Hapus</span>
-                                            </x-tombol>
+                                            <button type="submit"
+                                                    class="w-8 h-8 rounded-lg border border-border text-muted hover:text-danger hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition-colors cursor-pointer"
+                                                    title="Hapus Soal">
+                                                <x-ikon nama="trash-2" ukuran="15" />
+                                            </button>
                                         </form>
                                     </div>
                                 </td>
