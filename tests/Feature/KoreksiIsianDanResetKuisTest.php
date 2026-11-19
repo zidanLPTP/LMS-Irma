@@ -64,7 +64,7 @@ class KoreksiIsianDanResetKuisTest extends TestCase
 
     public function test_admin_dapat_mengoreksi_nilai_isian_dan_menghitung_ulang_kuis(): void
     {
-        $kuis = Kuis::factory()->create([
+        $kuis = Kuis::create([
             'tipe_kuis' => 'kuis_bab',
             'judul' => 'Kuis Uji Coba Isian',
             'nilai_lulus' => 65.00,
@@ -89,18 +89,21 @@ class KoreksiIsianDanResetKuisTest extends TestCase
             'user_id' => $this->siswa->id,
             'kuis_id' => $kuis->id,
             'nomor_percobaan' => 1,
+            'urutan_soal_teracak' => [$soal->id],
             'waktu_mulai' => now()->subMinutes(10),
             'waktu_selesai' => now()->subMinutes(5),
             'status_pengerjaan' => 'selesai',
             'nilai_otomatis' => 0.00,
             'nilai_akhir' => 0.00,
-            'status_kelulusan' => 'tidak_lulus',
+            'status_kelulusan' => 'belum_lulus',
         ]);
 
         $jawaban = JawabanSiswa::create([
             'percobaan_kuis_id' => $percobaan->id,
             'soal_id' => $soal->id,
             'jawaban_teks' => 'mitokondrion',
+            'waktu_mulai_soal' => now()->subMinutes(8),
+            'waktu_jawab' => now()->subMinutes(7),
             'poin_diperoleh' => 0.00,
         ]);
 
@@ -125,7 +128,7 @@ class KoreksiIsianDanResetKuisTest extends TestCase
 
     public function test_admin_dapat_mereset_pengerjaan_kuis(): void
     {
-        $kuis = Kuis::factory()->create([
+        $kuis = Kuis::create([
             'tipe_kuis' => 'kuis_bab',
             'judul' => 'Kuis Yang Salah Soal',
         ]);
@@ -142,6 +145,7 @@ class KoreksiIsianDanResetKuisTest extends TestCase
             'user_id' => $this->siswa->id,
             'kuis_id' => $kuis->id,
             'nomor_percobaan' => 1,
+            'urutan_soal_teracak' => [$soal->id],
             'waktu_mulai' => now()->subMinutes(10),
             'status_pengerjaan' => 'selesai',
         ]);
@@ -150,6 +154,8 @@ class KoreksiIsianDanResetKuisTest extends TestCase
             'percobaan_kuis_id' => $percobaan->id,
             'soal_id' => $soal->id,
             'jawaban_teks' => 'test',
+            'waktu_mulai_soal' => now()->subMinutes(8),
+            'waktu_jawab' => now()->subMinutes(7),
             'poin_diperoleh' => 0,
         ]);
 

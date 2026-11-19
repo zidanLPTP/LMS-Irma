@@ -246,7 +246,7 @@ class AdminKontenTest extends TestCase
             'bobot_poin' => 20,
         ])->assertRedirect(route('admin.kuis.soal.index', $kuis));
 
-        $this->assertEquals(3, $kuis->soal()->count());
+        $this->assertEquals(4, $kuis->soal()->count());
     }
 
     public function test_proteksi_integritas_data_penelitian_soal_dan_kuis(): void

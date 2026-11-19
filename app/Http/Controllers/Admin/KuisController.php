@@ -10,6 +10,7 @@ use App\Models\Kuis;
 use App\Models\Pengaturan;
 use App\Models\RiwayatNilaiEsai;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
