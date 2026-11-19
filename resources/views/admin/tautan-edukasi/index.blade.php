@@ -73,28 +73,20 @@
                                             </button>
                                         </form>
                                     </td>
-                                    <td class="px-4 py-3 text-center">
-                                        <div class="flex items-center justify-center gap-1.5">
-                                            <!-- Ubah Tautan -->
-                                            <a href="{{ route('admin.tautan-edukasi.edit', $item) }}"
-                                               class="w-8 h-8 rounded-lg border border-border text-muted hover:text-green-700 hover:bg-green-50 hover:border-green-300 flex items-center justify-center transition-colors"
-                                               title="Ubah Tautan">
-                                                <x-ikon nama="pencil" ukuran="15" />
-                                            </a>
+                                    <td class="px-4 py-3 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <x-tombol tipe="garis" href="{{ route('admin.tautan-edukasi.edit', $item) }}" class="!min-h-[32px] !px-2.5 !py-1 text-xs">
+                                                <x-ikon nama="pencil" ukuran="14" />
+                                                <span>Ubah</span>
+                                            </x-tombol>
 
-                                            <!-- Hapus Tautan -->
-                                            <form method="POST" action="{{ route('admin.tautan-edukasi.destroy', $item) }}"
-                                                  data-konfirmasi="Apakah Anda yakin ingin menghapus tautan game edukasi ini?"
-                                                  data-konfirmasi-bahaya="true"
-                                                  data-konfirmasi-tombol="Ya, Hapus"
-                                                  class="inline">
+                                            <form method="POST" action="{{ route('admin.tautan-edukasi.destroy', $item) }}" data-konfirmasi="Apakah kamu yakin ingin menghapus tautan game edukasi ini?" data-konfirmasi-bahaya="true" data-konfirmasi-tombol="Ya, Hapus" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit"
-                                                        class="w-8 h-8 rounded-lg border border-border text-muted hover:text-danger hover:bg-red-50 hover:border-red-300 flex items-center justify-center transition-colors cursor-pointer"
-                                                        title="Hapus Tautan">
-                                                    <x-ikon nama="trash-2" ukuran="15" />
-                                                </button>
+                                                <x-tombol tipe="bahaya" class="!min-h-[32px] !px-2.5 !py-1 text-xs" type="submit">
+                                                    <x-ikon nama="trash-2" ukuran="14" />
+                                                    <span>Hapus</span>
+                                                </x-tombol>
                                             </form>
                                         </div>
                                     </td>
